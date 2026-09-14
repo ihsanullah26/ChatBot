@@ -1,0 +1,14 @@
+# Virtual Environments
+venv/
+.venv/
+
+# Environment / Secret Keys
+.env
+
+# Logs and Caches
+chat_logs.jsonl
+__pyc
+ache__/
+*.pyc
+
+*.sql

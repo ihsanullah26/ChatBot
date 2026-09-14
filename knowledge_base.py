@@ -1,0 +1,1255 @@
+WATCHMAN_KNOWLEDGE_BASE = """
+ABOUT WATCHMAN
+Watchman (by pp-Code / Watchman Online LLC) makes WiFi-connected IoT
+sensors that monitor temperature, humidity, pressure, gas, water leaks,
+and noise, with alerting, aimed at protecting homes, rentals, freezers,
+wine cellars, storage units, and offices. The company also builds
+longer-range LoRa sensors (up to about 0.6 miles / 1km range, versus
+roughly 75ft for the WiFi products).
+
+PRODUCT LINEUP
+- Standard Watchman (with or without display): temperature, humidity.
+- Standard Watchman with Pressure Sensor: temperature, humidity, pressure.
+- Watchman with External Probe (1-3 probes): temperature plus up to
+  three separately-named probe temperatures.
+- Watchman for pool/spa (10k NTC thermistor probe): temperature.
+- Watchman with K-Type Thermocouple: temperature for very hot or very
+  cold environments.
+- Watchman with Gas monitoring: temperature, humidity, relative gas level.
+- Watchman with Water sensor and buzzer: temperature, humidity, water
+  sensor reading.
+- Waterlite Watchman: water sensor.
+- Watchman with Noise Sensor: temperature, humidity, noise level.
+- Watchman with ON/OFF Relay: temperature, humidity, and a relay that
+  can operate an appliance according to configured temperature/humidity
+  values.
+- Long-range LoRa Watchman products support sensor deployments up to
+  approximately 1km / 0.6 miles. WiFi products have a range of roughly
+  75ft.
+- Accessories include a 4G-LTE modem and a plug-and-play WiFi Gateway.
+- Some products offer SD card local data storage.
+
+MOBILE APPS
+- The Watchman Online app is available for both Android and iOS.
+  - Android: Google Play Store, package com.netstratum.watchman.
+  - iOS: Apple App Store, app id 1434683526.
+- The app provides access to logs, alerts, and Real Time Reading in
+  addition to the web portal.
+
+WEBSITE AND PORTAL NAVIGATION
+- Main marketing site: watchman.online (product info, FAQ, setup guide,
+  features, pricing, return/refund policy).
+- Customer portal (login/register/manage units, view logs, configure
+  alerts, manage subscriptions): pp-code.com.
+- Purchase/checkout site: buy.watchman.online (buy or lease units,
+  product selection guide, accessories like the WiFi Gateway).
+- Key portal pages:
+  - MANAGE-WATCHMAN: add/edit/delete/transfer units, rename locations,
+    view WiFi signal strength (firmware v17+), name probes.
+  - Buy Subscription: monthly/yearly/BuyOut plans, Tiered/Bundled
+    subscription options for 5+ units.
+  - Alert Suppression settings: adjust suppression duration and the
+    safety-override temperature.
+  - Chart page: graph visualization of log history, daily Min/Max
+    (subscribed units).
+- Setup guide: watchman.online/setup.
+- Product Selection Guide (helps choose which Watchman type fits a
+  use case): buy.watchman.online/SelectionGuide.html.
+- To register a new account: pp-code.com, or the "Register" link from
+  watchman.online.
+- The portal login page supports "Save Email" for faster future logins.
+
+PRICING AND PLANS
+- WiFi Watchman unit price starts at $37; price varies by product type.
+- WiFi Gateway accessory: $20.
+- Subscription (per Watchman unit, optional):
+  - $2.49/month, or $19.99/year.
+  - BuyOut (one-time, lifetime): $49.99. BuyOut is not transferrable
+    between units. Buying BuyOut at purchase time (vs. adding later)
+    is discounted.
+  - Tiered/Bundled subscription: modest additional discount for
+    customers with 5+ units, available on the "Buy Subscription" page
+    in the portal. Also allows "rolling" a subscription from one unit
+    to another (except BuyOut).
+  - Additional text-alert phone numbers: $1.50/month (or $18/year)
+    for 1 additional number, $3.00/month (or $36/year) for 2, $4.50/
+    month (or $54/year) for 3.
+- Basic features (no subscription needed, included with every unit):
+  - Portal/app access for logs and alert configuration.
+  - Hourly logging (immediate log on sudden change).
+  - Downloadable Excel log export.
+  - Up to 6 days of log history.
+  - Email alerts to the admin's email address.
+  - API access to retrieve logs from the unit.
+- Features that require a subscription, BuyOut, or lease:
+  - Additional alert emails (up to 3 total, including admin's).
+  - Text/SMS alerts (one US/Canada number included; more can be added
+    for a fee, see pricing above).
+  - Watchman Heartbeat: health check every 15 minutes, helps detect
+    power/internet outages.
+  - Choice of 15-minute logging (30-day retention) or hourly logging
+    with 60-day retention (vs. 6 days on the free tier).
+  - Daily email log snapshot.
+  - WiFi-Rotation feature (useful for WiFi migration or prepping a
+    unit for a remote site).
+  - Add Users feature: admin can add up to 5 additional users per
+    Watchman unit.
+  - 1-year product warranty with lifetime support (see WARRANTY below).
+
+WARRANTY AND RETURNS
+- 30-day money-back guarantee on all units.
+- Product warranty: 1 year for subscribed/BuyOut customers, 90 days
+  otherwise.
+- Full return and refund policy: watchman.online/return-and-refund-policy.
+
+TECHNICAL SPECIFICATIONS
+- Standard Watchman and the external-probe version: temperature
+  approximately -40°F to 170°F, accuracy approximately +/-5%.
+  Other product types have their own specifications.
+- Humidity: 0-100%.
+- WiFi: 802.11 b/g/n, 2.4GHz, WPA/WPA2.
+- Watchman does NOT support 5GHz WiFi.
+- WiFi network names and passwords can contain spaces.
+- Common special characters supported in WiFi names/passwords include:
+  ~ ! @ # $ ^ & * - _ + = ( ) : ; " ' , .
+- Watchman is powered by USB and ships with a USA USB power adapter
+  supporting 110-240V AC.
+- Approximate combined upload/download bandwidth usage is about 1MB/day.
+  A unit using only basic features consumes approximately 0.3-0.4MB/day.
+- Protect Watchman from direct sunlight and keep ambient temperature
+  between approximately 0°F and 150°F.
+- Suggested power-bank current budget:
+  150mA for regular units,
+  200mA for units with a 1M probe,
+  300mA for other unit types.
+
+POWER CONSUMPTION
+Customer testing on a regular Watchman reported:
+- Startup peak current: approximately 125mA at 5.3V.
+- LCD on steady-state low: approximately 70mA.
+- LCD off steady-state low: approximately 40mA.
+- When contacting the internet: 80+mA.
+- When LCD is turned on again: initially approximately 100mA,
+  settling to approximately 70mA.
+
+FIRMWARE
+- Watchman units showing firmware version 3.1.3 can be upgraded to 3.1.4
+  locally using a PC/laptop and the provided instructions.
+- Other Watchman units use firmware version 15, or version 17 for some
+  types.
+- Firmware cannot be remotely pushed to those units.
+- Customers can send the unit to pp-Code and pay $15 for shipping both
+  ways to have the firmware upgraded.
+- Computer-savvy customers can request the firmware files at no cost and
+  perform the upgrade themselves at their own risk.
+- Firmware questions can be sent to tech@pp-code.com.
+
+COMMUNITY PLUGINS AND SCRIPTS
+- Community-created Grafana/InfluxDB integration is available.
+- A community Hubitat driver is available.
+- A community Homebridge/HomeKit plugin is available.
+- A community Linux/BASH script can retrieve temperature and humidity
+  readings directly from a Watchman on the local network.
+- These are community contributions and are not official pp-Code products.
+
+============================================================
+FAQ — WIFI AND SETUP
+============================================================
+
+QUESTION: I have a mesh WiFi network. What is the recommended approach
+to connect Watchman to it?
+
+ANSWER:
+Most mesh WiFi implementations broadcast the same WiFi name for both
+2.4GHz and 5GHz. Watchman cannot negotiate between the two bands and
+therefore will not work with a combined 2.4GHz/5GHz network.
+
+The recommended approach is to configure a guest WiFi network on the
+mesh router that operates at 2.4GHz only, and connect Watchman to that
+guest network.
+
+Important: if the phone/tablet is connected to the main WiFi network,
+the "Real Time Reading (local)" feature may not work because main and
+guest WiFi networks normally cannot communicate with each other.
+
+QUESTION: Does Watchman support 5GHz WiFi?
+
+ANSWER:
+No. Watchman requires a 2.4GHz WiFi signal.
+
+QUESTION: What does "HalfOn" mean?
+
+ANSWER:
+"HalfOn" means Watchman is connected to WiFi but cannot reach the
+internet.
+
+Possible causes include:
+- weak WiFi signal,
+- loss of internet service at the site,
+- firewall restrictions or policies on the router.
+
+QUESTION: How do I reset Watchman to factory default?
+
+ANSWER:
+1. Restart Watchman by unplugging and plugging it back in.
+2. Using a tablet/mobile device, connect to the WiFi network named
+   ppC_noInternet_xxxxxx.
+3. Open Chrome or Safari.
+4. Go to:
+   192.168.4.1/reset
+5. Press Enter.
+
+QUESTION: How do I change the WiFi settings?
+
+ANSWER:
+You do not need to factory-reset Watchman.
+
+Simply perform the setup process again. The new WiFi credentials will
+overwrite the old credentials.
+
+Steps:
+1. Restart Watchman. Unplug it, wait approximately 10 seconds, and
+   plug it back in.
+2. On Android, open the Watchman Online app and select Setup.
+3. Otherwise, connect a tablet/mobile device to the
+   ppC_noInternet_xxxxxx WiFi network.
+4. If necessary, forget your normal WiFi network so the device remains
+   connected to ppC_noInternet_xxxxxx.
+5. Open Chrome or Safari and go to:
+   192.168.4.1
+6. Enter the WiFi SSID and password.
+7. Press Connect and wait approximately 10 seconds.
+8. When the success message appears, Watchman will automatically
+   restart.
+
+QUESTION: What if I take my Watchman to a different location?
+
+ANSWER:
+Connect Watchman to the new location's WiFi using the normal setup
+procedure.
+
+You do NOT need to re-register or re-activate the Watchman.
+
+If desired, you can change the location name in the portal:
+WiFi Watchman -> MANAGE-WATCHMAN -> pencil/edit icon.
+
+QUESTION: I switched internet providers, do I need to reconnect my
+Watchman to the new WiFi?
+
+ANSWER:
+It depends on whether the WiFi network name (SSID) and password
+stayed the same or changed:
+- If your new internet provider kept the SAME WiFi name and
+  password you had before (e.g. you kept using the same router, or
+  your provider preserved your settings), Watchman does NOT need to
+  be reconnected — it already has those credentials stored.
+- If the WiFi name and/or password CHANGED (e.g. a new router with
+  a new default SSID/password), then YES, you'll need to redo the
+  WiFi setup with the new credentials. You do NOT need to
+  re-register or re-activate the Watchman on the portal — just
+  perform the standard WiFi setup process again, entering the new
+  network's SSID and password; the new credentials overwrite the
+  old ones.
+
+Full step-by-step setup instructions are at watchman.online/setup.
+
+QUESTION: Will Watchman work with a WiFi extender?
+
+ANSWER:
+It may or may not work depending on the make and model of the extender.
+
+If the extender uses the same WiFi credentials as the main router,
+connect Watchman to the main router first while it is nearby. Then move
+Watchman to the desired location where the extender is operating.
+Because the WiFi credentials are the same, Watchman can automatically
+connect to the extender.
+
+Watchman requires 2.4GHz WiFi.
+
+QUESTION: How do I run an external probe into my freezer?
+
+ANSWER:
+There are multiple ways. One option is to route the external probe
+through an existing water-drain hose if the freezer has one.
+
+============================================================
+FAQ — REGISTRATION AND ACTIVATION
+============================================================
+
+QUESTION: Is registration on the pp-Code portal required to use Watchman?
+
+ANSWER:
+No.
+
+Watchman logs can be accessed directly using API calls either locally
+or remotely. Remote access requires port forwarding.
+
+QUESTION: What information is required for registration?
+
+ANSWER:
+A valid email address is required so that email alerts can be configured.
+
+A telephone/mobile number is optional unless the customer chooses to
+receive SMS alerts.
+
+QUESTION: What information is gathered during Watchman activation?
+
+ANSWER:
+The Watchman is mapped to a location.
+
+The customer provides the nearest city so the pp-Code portal can
+determine the correct timezone for displaying logs.
+
+The customer also names the location, such as:
+- basement
+- bedroom 1
+- shed
+- server room 10
+
+The location name does not have to be an address. A partial address or
+another unique location name can be used.
+
+QUESTION: I just activated my Watchman and only see 1 or 0 in the log
+page. Where are my actual logs?
+
+ANSWER:
+The system sends an initial log containing 1 and 0 values immediately
+after activation.
+
+The actual location/sensor logs should appear within approximately
+15 minutes to one hour.
+
+============================================================
+FAQ — NETWORK COMMUNICATION AND FIREWALL
+============================================================
+
+QUESTION: What type of communication does Watchman perform on the network?
+
+ANSWER:
+Once connected to WiFi, Watchman communicates externally in several ways.
+
+1. HTTP calls to the pp-Code portal:
+   Watchman sends collected location data to the portal so it can be
+   displayed on the log page.
+
+   Depending on the unit/features, collected data includes:
+   - temperature,
+   - humidity,
+   - gas level,
+   - count of active devices when Party-Detect is enabled.
+
+2. Syslog:
+   Watchman sends unit health and event logs to the pp-Code syslog server.
+
+3. NTP:
+   Watchman communicates with an internet NTP server to maintain its clock.
+
+Watchman does not perform internal LAN communication unless Party-Detect
+is enabled. With Party-Detect enabled, it sends pings to connected LAN
+devices to help determine the number of active devices.
+
+QUESTION: What firewall ports need to be opened for Watchman?
+
+ANSWER:
+The following should be allowed:
+
+- UDP port 5544 for syslogs to:
+  logsrv.pp-code.com
+
+- TCP port 80 for HTTP to:
+  pp-code.com
+  portal.pp-code.com
+
+QUESTION: What if the network has a captive portal or splash page?
+
+ANSWER:
+Watchman should be whitelisted on the internet gateway using its MAC
+address.
+
+The Watchman ID printed on the back of the unit contains a subset of
+the MAC address and can help identify the unit among the network's
+visible MAC addresses.
+
+============================================================
+FAQ — PORTAL AND APP
+============================================================
+
+QUESTION: Why can't I access the web portal from the app?
+
+ANSWER:
+The pp-Code app normally allows access to the web portal.
+
+If it does not work because of the phone version or security settings,
+the FAQ recommends adding "pp-code.com" to the Outlook address book
+under safe senders and domains.
+
+============================================================
+FAQ — LOGGING AND ALERTS
+============================================================
+
+QUESTION: How do alerts work?
+
+ANSWER:
+Watchman normally sends logs every hour. With an active subscription,
+the logging interval can be changed to every 15 minutes.
+
+Watchman sends a log immediately when it detects certain sudden changes.
+
+Temperature:
+- A change greater than approximately +/-5°F triggers an immediate log.
+
+Gas/water/noise units:
+- Gas or water reading changes of 50+ trigger an immediate log.
+- Noise level exceeding 80 or increasing by 10+ triggers an immediate log.
+
+When a log reaches the pp-Code portal, it is processed according to the
+user's configured alert settings.
+
+Email alert thresholds can be configured through the portal.
+SMS alerts require a paid subscription.
+
+QUESTION: How many regular alerts are sent for the same event?
+
+ANSWER:
+For a given event, such as temperature rising above a configured
+threshold, a maximum of two alerts are sent during a 24-hour period.
+
+The alert count resets daily at 12:17pm EST.
+
+If later readings remain outside the threshold, additional alerts for
+that event are not generated until a normal reading resets/re-enables
+the alert.
+
+This behavior is per event. Reaching the alert limit for one event does
+not prevent alerts for another event.
+
+QUESTION: What are sudden alerts?
+
+ANSWER:
+Sudden alerts are separate from regular alerts and are not limited to
+two alerts per event.
+
+The portal compares an arriving log with the previous log.
+
+A sudden alert can be triggered when:
+- temperature changes by 5+ degrees, or
+- gas/water/noise readings increase by 25+.
+
+The reading must also exceed the user's configured alert threshold.
+
+For temperatures below 15°F, such as freezer environments, a
+15-degree change is required instead of 5 degrees because normal freezer
+compressor cycling can produce temperature swings of around 10°F.
+
+============================================================
+FAQ — PARTY-DETECT
+============================================================
+
+QUESTION: What is Party-Detect?
+
+ANSWER:
+Party-Detect is an algorithmic estimate based on active devices detected
+on the local WiFi network.
+
+Every hour, Watchman determines the number of active network devices.
+The count resets every hour and increases as active devices are detected.
+
+At the end of the hourly cycle, the number is sent to the pp-Code portal.
+The portal then processes that number with the Party-Detect algorithm to
+estimate the number of people at the location.
+
+The result is not guaranteed to be an exact headcount.
+
+It is intended to reliably detect gatherings or sudden increases in
+activity.
+
+Party-Detect is offered as a value-added feature at no additional charge
+and is disabled by default.
+
+============================================================
+FAQ — API
+============================================================
+
+SUPPORTED APIs
+
+Watchman supports GET-based APIs.
+
+QUESTION: How can I get current Watchman statistics in JSON format?
+
+ANSWER:
+For firmware version 13 or higher, use:
+
+http://<IP address>/<key>&Stats/json
+
+Example:
+
+GET /aa7777063116&Stats/json
+
+The response contains information such as:
+- temperature,
+- humidity,
+- active-device count.
+
+Example response:
+
+{
+  "API": {"Version":"1"},
+  "Stats": {
+    "Temp":"77.9F",
+    "Humi":"66.1%",
+    "ActDev":"1"
+  }
+}
+
+QUESTION: How can I read the current statistics?
+
+ANSWER:
+For firmware version 9.1 or higher:
+
+http://<IP address>/<key>&Stats
+
+Example response:
+
+Temp:87.44F Humi:48.3% ActDev:0
+
+QUESTION: How can I read the current temperature on older firmware?
+
+ANSWER:
+For firmware version 9 or lower:
+
+http://<IP address>/<key>&Temperature
+
+QUESTION: How can I read the current humidity on older firmware?
+
+ANSWER:
+For firmware version 9 or lower:
+
+http://<IP address>/<key>&Humidity
+
+QUESTION: How can I read the current number of active devices?
+
+ANSWER:
+For firmware version 9 or lower:
+
+http://<IP address>/<key>&ActiveDevices
+
+Party-Detect must be enabled for this API to return the active-device
+count.
+
+The active-device count is recycled every hour.
+
+QUESTION: What is the IP address used in the API?
+
+ANSWER:
+The IP address is the local IP address assigned to the Watchman.
+
+It can be found using the Real Time Reading function in the Watchman
+Online app or by looking at the WiFi router. Watchman may appear as
+"NODE-xxxx".
+
+The IP address is normally DHCP-assigned and can change after Watchman
+restarts. A static DHCP assignment can be configured on the router if
+a stable address is desired.
+
+For internet access using port forwarding, the request uses the router's
+WAN address and forwarded port. HTTP port 80 is the default.
+
+QUESTION: What is the API key?
+
+ANSWER:
+The key is the 12-digit identifier specific to the purchased Watchman.
+It can be found next to "ID" on the back of the unit.
+
+============================================================
+FAQ — REAL TIME READING
+============================================================
+
+QUESTION: What is Real Time Reading?
+
+ANSWER:
+Watchman normally sends logs every hour, or every 15 minutes with a
+subscription.
+
+Watchman internally reads its sensors every minute and reacts to sudden
+changes immediately.
+
+Real Time Reading provides an option to query the Watchman directly and
+retrieve its current readings using the same API mechanism.
+
+QUESTION: Does Real Time Reading require port forwarding?
+
+ANSWER:
+For remote Real Time Reading, yes.
+
+The feature is intended for advanced users familiar with port forwarding
+on their WiFi router/access point.
+
+HTTP port 80 is the default port to forward.
+
+QUESTION: What should I do if Real Time Reading does not work?
+
+ANSWER:
+If port forwarding has been configured but Real Time Reading still
+fails, restart the Watchman and retry after approximately 5 minutes.
+
+QUESTION: Can I repeatedly request Real Time Reading?
+
+ANSWER:
+Avoid excessive requests.
+
+Watchman reads values once per minute, so repeatedly requesting the
+reading every few seconds provides no useful benefit and may cause the
+Watchman to restart.
+
+============================================================
+FAQ — ALERT SUPPRESSION
+============================================================
+
+QUESTION: What is Alert Suppression?
+
+ANSWER:
+Alert Suppression is designed for single-probe Watchman units installed
+in freezers.
+
+It reduces unnecessary alerts during freezer defrost cycles, when the
+temperature is expected to rise temporarily.
+
+QUESTION: Is Alert Suppression enabled by default?
+
+ANSWER:
+No. It is OFF by default.
+
+QUESTION: How does Alert Suppression work?
+
+ANSWER:
+By default, alert suppression begins when the temperature rises above
+0°F.
+
+The default suppression duration is 60 minutes.
+
+Suppression ends when:
+- temperature falls below 0°F, or
+- the configured suppression duration expires.
+
+The duration can be changed through the portal.
+
+QUESTION: Is there a safety override for Alert Suppression?
+
+ANSWER:
+Yes.
+
+By default, if temperature rises above 15°F, normal alerting resumes
+even if the suppression timer has not expired.
+
+The user can change this setting through the portal.
+
+============================================================
+FAQ — WIFI GATEWAY
+============================================================
+
+QUESTION: What is the Watchman WiFi Gateway?
+
+ANSWER:
+The WiFi Gateway provides a plug-and-play way to connect Watchman.
+
+Connect the Gateway to an existing router using a cable. Watchman is
+pre-programmed to connect to the Gateway's WiFi, so no WiFi setup needs
+to be performed on the Watchman itself.
+
+QUESTION: How many Watchman units can use one WiFi Gateway?
+
+ANSWER:
+One Gateway can be used for all Watchman units at a given location.
+
+QUESTION: Does the WiFi Gateway provide internet service?
+
+ANSWER:
+No.
+
+The Gateway does not provide or replace the customer's existing
+internet service.
+
+============================================================
+FAQ — TEXT ALERTS
+============================================================
+
+QUESTION: How many phone numbers are included with a subscription?
+
+ANSWER:
+Standard monthly, yearly, and BuyOut subscription offerings include
+one phone number for SMS/text alerts.
+
+QUESTION: Can I add additional phone numbers for text alerts?
+
+ANSWER:
+Yes.
+
+Additional text-alert phone numbers cost $1.50 per month for each
+additional number.
+
+After payment, pp-Code enables the additional number(s) on the portal
+and sends an email update, normally within one business day.
+
+============================================================
+LOGGING
+============================================================
+
+- Watchman reads sensor values every minute.
+- Normal logs are sent to the pp-Code portal every hour.
+- Subscription users can change the logging interval to every 15 minutes.
+- Sudden temperature changes can cause an immediate log.
+- Gas/water/noise units can also generate immediate logs based on
+  their respective sudden-change conditions.
+- The first post-activation log may contain 1 and 0 values.
+- Actual location/sensor logs normally appear within 15 minutes to one hour
+  after activation.
+
+============================================================
+PORTAL FEATURES AND RECENT UPDATES
+============================================================
+
+MAY 2026
+- Daily Min/Max capture was introduced for subscribed units.
+- Daily Min/Max values are included in the daily email log snapshot and
+  shown on the chart page.
+- Real Time Reading can be enabled as a centralized function across all
+  units on the Watchman page.
+- Centralized Real Time Reading requires port forwarding and is not
+  enabled by default. Customers can request activation at
+  tech@pp-code.com.
+
+JAN 2026
+- Portal logs received specific colors:
+  red = logs that trigger an alert,
+  green = logs that normalize,
+  black = default logs.
+- Old Watchman units can be deleted from the MANAGE-WATCHMAN tab.
+
+SEPTEMBER 2024
+- Email notification was added when readings return to normal after the
+  alert limit has been reached.
+- Watchman ownership can be transferred to another registered user using
+  MANAGE-WATCHMAN.
+- Logs can be selectively or bulk deleted.
+
+DECEMBER 2023
+- A one-time 30-day free subscription was introduced as an offering per
+  account.
+- A one-time one-year subscription payment option was introduced.
+- Subscription pricing was revised for new subscriptions.
+- Existing subscriptions continue at the original price while
+  auto-renewed.
+- Graph visualization was introduced on the portal.
+
+JUNE 2023
+- Watchman with ON/OFF Relay was introduced.
+- The relay can programmatically operate an electrical appliance based
+  on user-configured temperature/humidity values.
+
+MARCH 2023
+- 4G modem data-usage API issue was addressed.
+- Real Time Reading WAN-IP issue was addressed.
+- WiFi Signal Strength was added to MANAGE-WATCHMAN for units with
+  firmware version 17 and later.
+- Users can change the payment method for current subscriptions and
+  data plans.
+
+SEPTEMBER 2022
+- Long-range LoRa Watchman products were introduced.
+- LoRa products support sensor deployment up to approximately 1km /
+  0.6 miles.
+- WiFi products have approximately 75ft range.
+- Multi-probe Watchman users can name Probe 1, Probe 2, and Probe 3
+  on the portal.
+- Watchman units can be deleted from MANAGE-WATCHMAN.
+- Tiered subscription plans were introduced earlier in 2022 for customers
+  with 5 or more Watchman units.
+- Pressure, noise, and pool/spa thermistor Watchman types were introduced.
+- The portal login page supports "Save Email".
+
+============================================================
+LOGGED-IN PORTAL NAVIGATION (pp-code.com)
+============================================================
+NOTE: this section describes the AUTHENTICATED portal (after login),
+based on user-supplied screenshots plus structured documentation. It
+covers only what was actually observed — screens not shown are marked
+"not yet verified" rather than guessed at. If a customer's question
+reaches one of those unverified screens, say so rather than inventing
+fields or buttons.
+
+Top-level navigation tabs: Admin, WiFi Watchman, Need Help, Product
+Info, Buy Watchman, Logout.
+
+ADMIN TAB
+- Sub-tabs: ADMIN INFO, MY REWARDS, ORDER HISTORY.
+- Admin Info page shows: WiFi Watchman shortcut, LoRa Watchman logs
+  shortcut, Name, Contact Number, Alternate Contact Number, Email,
+  Registered since, Last Login, an "Update" button, "Change Password"
+  button, "Activate/Add your Product" button, a Quick Tips panel, and
+  "Delete My Account".
+- To update account info: Admin -> Admin Info -> Update.
+- To change password while logged in: Admin -> Admin Info -> Change
+  Password (different from "Forgot Password" on the login screen).
+- To activate/register a new Watchman: Admin -> Admin Info ->
+  Activate/Add your Product. (The exact form on the next screen is
+  not yet verified.)
+- To delete the entire account: Admin -> Admin Info -> Delete My
+  Account. This is account-level and destructive — different from
+  deleting a single Watchman or cancelling a subscription. Always
+  flag this distinction and confirm the customer means their whole
+  account before treating a question as this action.
+- Admin Info's Quick Tips panel itself answers: how to connect
+  Watchman to WiFi; how to reconnect after moving the Watchman or
+  changing WiFi (redo WiFi setup — you do NOT need to reactivate on
+  the portal); and how to rename a Watchman or change its time zone
+  (WiFi Watchman -> MANAGE-WATCHMAN -> pencil/edit icon).
+
+WIFI WATCHMAN TAB
+- Sub-tabs: WATCHMAN, MANAGE-WATCHMAN, 4G-LTE-MODEM, WATCHMAN-USERS.
+
+WiFi Watchman -> WATCHMAN (the main Watchman list):
+- Click a Watchman's name to open its logs.
+- Columns: Watchman Name, Recent Logs, Time/Date, Access Type (Admin
+  or Regular User), Paid-Subscription Status, Auto-Renew.
+- "Search by name" box filters the list.
+- Status-check-enabled Watchmen show green/red online-offline
+  indicators; this feature requires a subscription.
+- Buttons here: Buy Subscription, Change Subscription, Cancel
+  Subscription, Apply Tiered Subscription, Cancel Tiered
+  Subscription.
+- A credits table below shows token, type, purchased credits,
+  available credits, and auto-renew.
+
+WiFi Watchman -> MANAGE-WATCHMAN (device management):
+- Click "Activated" in the Watchman column to see that device's
+  location logs.
+- Pencil/edit icon: edit Watchman info. CONFIRMED (from internal
+  support responses) this edit page offers at least two distinct
+  options: (1) change the Watchman's name/time zone, and (2)
+  TRANSFER the Watchman to another registered user (choose the
+  transfer option on that same edit page).
+- X icon: remove/delete that Watchman. This is destructive — confirm
+  which Watchman before proceeding, and note the exact confirmation
+  dialog wording is not yet verified.
+- Columns: Watchman Name, Start Date, Subscription Status,
+  Auto-Renew, Activated (link), Action (pencil/X).
+
+IMPORTANT DISAMBIGUATION — two different things both called
+"transfer", do not conflate them:
+1. TRANSFERRING A WATCHMAN TO ANOTHER USER (changing who owns/
+   controls the device): WiFi Watchman -> MANAGE-WATCHMAN -> pencil
+   icon on that Watchman -> choose the transfer option. If the new
+   owner doesn't already have an account, they must register first
+   at pp-code.com/?rt=login/register before the transfer can
+   proceed. This is about ownership of the physical unit.
+2. ROLLING A SUBSCRIPTION BETWEEN UNITS (moving which Watchman a
+   Tiered/Bundled subscription applies to, same owner): done from
+   the "Buy Subscription" / Tiered Subscription area on the WATCHMAN
+   page, not from MANAGE-WATCHMAN. BuyOut (lifetime) subscriptions
+   specifically are NOT transferrable/rollable between units — that
+   restriction applies to case 2 (moving a subscription between
+   units you own), NOT to case 1 (transferring a whole Watchman,
+   subscription included, to a different person). Do not apply the
+   "BuyOut isn't transferrable" rule when answering a
+   transfer-to-another-user question — it belongs to the other
+   feature.
+
+WiFi Watchman -> 4G-LTE-MODEM (for units with an LTE modem):
+- Columns: Name, Product ID, Data Usage, Data Plan, Auto-Renew,
+  pencil icon to edit.
+- "Buy or Change Data Plan" button: purchase or change the modem's
+  data plan.
+- "Suspend or Cancel Data Plan" button: suspend or cancel it.
+
+WiFi Watchman -> WATCHMAN-USERS (manage who has access):
+- Shows two tables: "Manage Watchman Users" (users you administer,
+  with an X to remove access) and "View Watchman Users" (users with
+  access to Watchmans you can see but may not administer).
+- VERIFIED path to add a user: WiFi Watchman -> WATCHMAN -> click
+  the specific Watchman's name (opens its logs page) -> click the
+  "Alert Configuration" button (top right of the logs page) -> on
+  that page, scroll to the "Add Users" feature near the bottom, and
+  follow the steps there. Adding users requires an active
+  subscription or BuyOut on that Watchman, and up to 5 users can be
+  added per Watchman.
+- "Regular" users (added this way) have access to every feature
+  EXCEPT the ability to add other users. A single account/login can
+  itself have multiple Watchman units under it, so one person can
+  manage several units from one login regardless of user role.
+- Only one Admin per Watchman. Only the Admin can add/delete users
+  or cancel that Watchman's subscription. Other actions are
+  available to all users with access.
+
+ALERT CONFIGURATION — VERIFIED full page layout
+screenshot (path: WiFi Watchman -> WATCHMAN -> click the Watchman's
+name -> "Alert Configuration" top right):
+- Header shows "Configure alerts for [Watchman name]", a "Back"
+  link, and a "Send a Test Alert" button (top right) — this is the
+  "Test Alert" feature; use it to confirm a phone number or email is
+  actually receiving alerts.
+- Core threshold fields (leave a field empty if that alert isn't
+  wanted): "Alert me when temperature rises above the value",
+  "...drops below the value", "Alert me when humidity rises above
+  the value", "...drops below the value". Each threshold has its
+  own separate "Enable Text Alert" checkbox — meaning email alerting
+  and SMS/text alerting can be turned on independently per
+  threshold, not just globally.
+- Sudden-change alerts (the +/-5°F / sudden humidity change
+  behavior) can be toggled off via a Yes/No dropdown on this page
+  (default appears to be Yes/enabled).
+- RELAY CONTROL (for Watchman units with a relay — e.g. "relay"-type
+  units): a dropdown to "Operate the relay using" a selected metric
+  (e.g. Humidity, or "none" if not desired). If enabled, you set:
+  the value at which the relay energizes/turns ON, the value at
+  which it de-energizes/turns OFF (this hysteresis gap prevents
+  rapid on/off cycling), and a "Maximum duration (in hours) for
+  relay to stay ON" (default 12) as a safety cutoff so the relay
+  can't stay engaged indefinitely if the threshold condition
+  persists.
+- "More Features" (an expandable/collapsible panel) contains:
+  - Logs behavior dropdown (e.g. "Frequent log (every 15 min,
+    30-day)") — this is where the subscription log-frequency choice
+    is actually set.
+  - Current Watchman status display (Online/Offline).
+  - Watchman Heartbeat setting: "Alert me if Watchman status
+    changes" (Yes/No + its own Enable Text Alert checkbox) — status
+    is checked every 15 minutes, helping detect power outages, lost
+    connection, no internet, etc. A second dropdown sets the
+    sensitivity, e.g. "alert on 2 heartbeat failures" (default),
+    meaning it takes that many consecutive failed checks before
+    alerting (avoids false alarms from a single missed check).
+  - "Alert me if Relay status changes" (Yes/No + its own Enable Text
+    Alert checkbox) — separate from the Watchman-status heartbeat
+    alert above; only relevant for relay-equipped units.
+  - "Receive daily email with log's snapshot" (Yes/No) — a daily
+    digest email, described as useful for record-keeping/audit.
+  - Mobile number field for text alerts (US/Canada only), with a
+    consent notice (standard message/data rates may apply, reply
+    STOP to opt out). One additional mobile number field is
+    available directly on this page; beyond that, additional
+    numbers require emailing tech@pp-code.com, at $1.50/month per
+    additional number.
+  - Email fields: "Change your current email for alerts" (pre-filled
+    with the account email), plus "Provide 1st additional email for
+    alert" and "Provide 2nd additional email for alert" — this
+    confirms the "up to 3 total including admin" email-alert limit
+    mentioned elsewhere in this document.
+- "Click here to save your settings" button — click this after any
+  change; nothing is saved automatically.
+- Below the save button: an "Add Users" section — "admin may specify
+  additional users (up to 5) for this Watchman," with a link to
+  proceed. WiFi-Rotation is also accessible further down this same
+  page.
+- Features shown in blue text/font are noted as available with
+  subscription (vs. plain black text for features available to
+  everyone).
+
+WATCHMAN LOGS PAGE (WiFi Watchman -> WATCHMAN -> click a Watchman's
+name) — VERIFIED layout:
+- Header shows the Watchman's name, an "Export in Excel" link, and a
+  "Back" link.
+- Buttons across the top: "Restart Watchman" (may be greyed out/
+  disabled depending on the unit's connection state), "Turn OFF
+  Watchman Display" (controls the physical unit's on-device
+  display), and "Alert Configuration" (opens the alert settings
+  described above).
+- "Real Time Reading" button, alongside a "Port Forwarding" number
+  input field and a "Save" button. IMPORTANT: the port number you've
+  forwarded on your router must also be entered and saved HERE in
+  the portal (not only configured on the router) for remote Real
+  Time Reading to work. A "here" link next to it opens more details,
+  noting Real Time Reading is intended for advanced users.
+- "View Graphs" button (top right) — opens the chart/graph
+  visualization of log history.
+- The log table itself has a "Duration" date-picker (pick a specific
+  day) plus a "Show All logs" button (view full history instead of
+  one day), and a "Time" column for each entry.
+- Per-metric columns each have their own controls, for example:
+  - "Number of people (estimated)": a dropdown plus an "Adjust"
+    button, letting you manually correct/tune the estimated count.
+  - "Temperature" (or other sensor metrics): a unit dropdown (e.g.
+    F/C) plus a value dropdown and "Calibrate" button — select the
+    desired offset/value and click Calibrate to apply.
+- Log rows may show sensor values with color coding (e.g. green vs.
+  red) — this most likely reflects whether that reading is within
+  vs. outside the configured alert threshold for that metric, though
+  the exact coloring rule isn't independently confirmed.
+- A checkbox column (with a trash/delete icon above it) appears
+  next to each row, suggesting rows can be selected for a bulk
+  action such as deletion — the exact behavior isn't confirmed.
+- Not every column/feature applies to every Watchman type — e.g. a
+  temperature-only probe may show "-" in a people-count column
+  since that feature isn't relevant/enabled for that unit.
+
+BUY WATCHMAN TAB
+- Takes the customer to the external purchasing site,
+  buy.watchman.online — this is outside the logged-in portal.
+
+NEED HELP TAB
+- A contact form: fields for the customer's email (pre-filled),
+  subject, and message, plus a "Send Email" button.
+- The page also states: email tech@pp-code.com directly (most
+  responses within one business day, faster if the question is
+  well-described), or call 732-410-6771 (voice-message only line —
+  for urgent matters, send an SMS to that number for a callback).
+
+NOT YET VERIFIED (acknowledge these exist, but don't invent their
+internal layout or fields if asked):
+- Product Info tab's internal content.
+- Admin -> My Rewards internal content.
+- Admin -> Order History internal content.
+- The exact form after Admin -> Activate/Add your Product.
+- The exact edit form after the MANAGE-WATCHMAN pencil icon.
+- The exact deletion confirmation after the MANAGE-WATCHMAN X icon.
+- The exact "Add Users" and "WiFi-Rotation" sub-forms reached from
+  the Alert Configuration page (their existence and rough location
+  are confirmed, but not their internal fields).
+- The exact behavior of the checkbox/trash-icon bulk-action on the
+  logs page.
+- The 4G-LTE-MODEM pencil-icon edit screen.
+- The exact Buy/Change and Suspend/Cancel data-plan flows.
+- Login and Forgot Password screens.
+
+COMMON "HOW DO I..." QUESTIONS, MAPPED TO VERIFIED NAVIGATION
+- Update my account info -> Admin -> Admin Info -> Update
+- Change my password -> Admin -> Admin Info -> Change Password
+- Activate/add a Watchman -> Admin -> Admin Info -> Activate/Add
+  your Product
+- Delete my account -> Admin -> Admin Info -> Delete My Account
+  (destructive — confirm this means the whole account)
+- See my Watchmans -> WiFi Watchman -> WATCHMAN
+- See a Watchman's logs -> WiFi Watchman -> WATCHMAN -> click its
+  name
+- Search for a Watchman -> WiFi Watchman -> WATCHMAN -> Search by
+  name
+- Rename a Watchman / change its time zone -> WiFi Watchman ->
+  MANAGE-WATCHMAN -> pencil icon
+- See a Watchman's location logs -> WiFi Watchman -> MANAGE-WATCHMAN
+  -> click "Activated"
+- Remove a Watchman -> WiFi Watchman -> MANAGE-WATCHMAN -> X
+  (destructive — confirm which Watchman first)
+- Manage an LTE modem -> WiFi Watchman -> 4G-LTE-MODEM
+- Buy/change an LTE data plan -> WiFi Watchman -> 4G-LTE-MODEM ->
+  Buy or Change Data Plan
+- Suspend/cancel an LTE plan -> WiFi Watchman -> 4G-LTE-MODEM ->
+  Suspend or Cancel Data Plan
+- See who has access to my Watchman -> WiFi Watchman ->
+  WATCHMAN-USERS -> View Watchman Users
+- Remove a user's access -> WiFi Watchman -> WATCHMAN-USERS ->
+  Manage Watchman Users -> X (admin only)
+- Add a user -> WiFi Watchman -> WATCHMAN -> open the Watchman ->
+  Alert Configuration -> Add User (requires subscription)
+- Buy a Watchman -> Buy Watchman tab -> buy.watchman.online
+- "I moved my Watchman / changed my WiFi, do I need to reactivate?"
+  -> No. Redo WiFi setup with the new credentials; you do NOT need
+  to reactivate on the portal.
+
+============================================================
+CHATBOT BEHAVIOR RULES FOR PORTAL/NAVIGATION QUESTIONS
+============================================================
+These are guardrails for how to answer, not facts to relay to the
+customer:
+- Do not claim to see or modify the customer's actual account, since
+  this chatbot has no live authenticated access to it.
+- Never confuse deleting a single Watchman (MANAGE-WATCHMAN -> X)
+  with deleting the entire account (Admin -> Delete My Account) —
+  these are different, and the account one is far more destructive.
+- Consider whether the action needs Admin access (vs. Regular User)
+  before giving instructions for an administrative action like
+  adding/removing users or cancelling a subscription.
+- Some features require an active subscription (e.g. adding
+  additional users, status-check indicators). Don't imply these are
+  available to every customer regardless of subscription status.
+- Not every Watchman model has the same sensors or capabilities —
+  don't assume all units behave identically.
+- If a question reaches a screen marked "not yet verified" above,
+  say that the next step needs to be confirmed on the actual portal
+  rather than guessing at fields or button names.
+- For any destructive action (deleting a Watchman, deleting the
+  account, removing a user), clearly flag that it's destructive and
+  suggest the customer confirm the correct target before proceeding.
+- When multiple Watchmans or multiple possible actions could apply,
+  it's fine to ask one concise clarifying question rather than
+  guessing which one the customer means.
+
+============================================================
+WIFI SETUP AND TROUBLESHOOTING (detailed)
+responses)
+============================================================
+- Watchman only supports 2.4GHz WiFi, never 5GHz.
+- Mesh/dual-band routers that broadcast one combined SSID for both
+  bands will NOT work — set up a separate 2.4GHz-only guest network
+  instead.
+- Supported special characters in WiFi name (SSID) and password:
+  ~ ! @ # $ ^ & * - _ + = ( ) : ; " ' , .  Spaces within the name or
+  password are supported, but make sure there's no trailing space at
+  the end of what you type (cursor should sit right after the last
+  character).
+- Setup device requirement: use an Apple or Android phone/tablet for
+  the initial WiFi setup — do NOT use a Windows PC/laptop/tablet for
+  setup, since Windows won't connect to Watchman's local
+  no-internet SSID. Once setup is complete, Windows devices work
+  fine for accessing logs afterward.
+- If your device has a captive portal / "accept terms" flash page
+  that appears when connecting to networks, you may need your IT
+  department to whitelist the Watchman's MAC address (it starts with
+  "Node-xxxxxx") so it can pass through.
+- WiFi range: officially listed as up to 75ft (50ft for a stable
+  connection) on the marketing site, but real-world experience
+  guidance is more conservative — 30-40ft workable in most cases,
+  and actual range depends heavily on your specific WiFi router.
+- If setup fails on the "Error - Retry" page, tap/click the URL
+  shown there to expand it, copy the complete URL, and send it to
+  tech@pp-code.com for troubleshooting.
+- Connection status indicators (shown in the portal):
+  - "OnNet": fully connected, normal.
+  - "HalfOn": normal for the first few minutes right after
+    connecting (transitional). If it PERSISTS beyond that, it
+    usually means a stale IP address assignment at your router —
+    power off the Watchman unit(s), restart your WiFi router, then
+    power the Watchman unit(s) back on.
+  - "OffNet": not connected — redo the WiFi setup at
+    watchman.online/setup.
+- Firewall/network ports needed if your network has restrictive
+  firewall policies: port 80 to portal.pp-code.com, port 80 to
+  portal-2.pp-code.com, and port 5544 to logsrv.pp-code.com. The
+  Watchman's ID contains half of its MAC address, which can help an
+  IT department locate the specific device on the network.
+- Factory reset: power on the Watchman, connect a phone/tablet/PC to
+  its ppC_noInternet_... WiFi network, then go to
+  192.168.4.1/reset in a browser (Chrome/Safari preferred) and hit
+  enter — this resets the Watchman to factory defaults.
+
+============================================================
+FEATURES: PEOPLE COUNT / PARTY-DETECT, REAL TIME READING, WATER LEAK
+============================================================
+- People Count / "Party-Detect": the unit scans the number of active
+  devices on the WiFi network and sends that to the portal, which
+  estimates a people count based on typical trends for that
+  location's network activity. It won't show an exact headcount,
+  but reliably detects gatherings or sudden increases in activity —
+  hence "Party-Detect." Disabled by default; it's a free feature
+  with no added cost.
+- Real Time Reading (local): your mobile device must be on the SAME
+  network as the Watchman unit for this to work, since it fetches
+  data directly from the unit (which itself reads its sensors every
+  30 seconds). This is equivalent to walking up and looking at the
+  unit's own display. To check whether you're "local" to the unit,
+  compare the first three octets of your mobile device's IP address
+  and the Watchman's IP address — they should match.
+- Water leak sensor: reports a raw value from 0-1024. Dry conditions
+  read roughly 0-50; any water or moisture contact typically reads
+  300 or higher.
+
+============================================================
+API ACCESS (expanded)
+============================================================
+PREFERRED SIMPLE ANSWER for a general "what API/API calls are
+supported" style question (use this concise version rather than
+combining it with the more detailed FAQ entries elsewhere in this
+document, unless the customer asks a more specific follow-up):
+
+"You may run the call using a browser or your own script:
+http://<IP address>/<Watchman ID>&Stats or
+http://<IP address>/<Watchman ID>&Stats/json
+An example would be: http://192.168.0.43/050db9072118&Stats
+(this example assumes you are on the same local network as your
+Watchman)
+You may also run the call remotely. You will need to enable port
+forwarding (port 80) on your router and then use your WAN IP
+address in the above URL."
+
+Additional detail (only bring up if specifically asked further):
+- For REMOTE API access (from outside your home network), enable
+  port forwarding (port 80) on your router for the Watchman, then
+  call using your router's public/WAN IP instead of the unit's local
+  IP: http://<public IP of your router>/<Watchman ID>&Stats/json
+- By default there's no direct remote access to a unit's real-time
+  reading, since it sits behind your router/NAT — this is normal
+  network security behavior, not a bug. Port forwarding is what
+  removes that restriction if you want it.
+- Data update cadence: hourly logs by default (or every 15 minutes
+  with a paid subscription). Separately, a sudden temperature change
+  of +/-5°F, or a sudden gas-level increase of +25, triggers an
+  immediate log without waiting for the next scheduled cycle — this
+  happens regardless of subscription status.
+
+============================================================
+DATA CONSUMPTION
+============================================================
+- Very low: roughly 4KB/day with the default hourly logging
+  interval, up to about 15KB/day with the 15-minute logging interval
+  (subscription feature).
+
+============================================================
+WARRANTY, REPAIR, AND SOFTWARE-UPDATE PROCESS (expanded)
+============================================================
+- 30-day money-back guarantee (including original shipping).
+- 90-day product warranty by default; extended to 1 year for
+  subscribed/BuyOut units.
+- If a unit needs repair: support troubleshoots and repairs it; if
+  it can't be repaired, a replacement is sent instead. The customer
+  covers 2-way shipping, a flat $15 total. Process: an invoice for
+  $15 is sent, and once paid, a prepaid shipping label is emailed
+  for sending the unit in. Typical turnaround is 7-10 days after the
+  unit is received.
+- Free software/firmware upgrades are available at no cost beyond
+  the same $15 2-way shipping fee — same invoice-then-label process
+  as repairs. Turnaround after receipt is typically around 5-7 days.
+
+============================================================
+ACCOUNT AND REGISTRATION MISCELLANEOUS
+============================================================
+- Registration verification emails come from no-reply@pp-code.com —
+  if a customer hasn't received one, suggest checking the spam
+  folder first.
+- Changing account email: this CANNOT be done by the customer alone
+  — it must be done by support. The customer must email
+  tech@pp-code.com FROM their currently-registered email address,
+  with the new email address included as a CC on that message.
+  Support will then make the change manually. After the change is
+  made, it's good practice to send a test alert (via Alert
+  Configuration -> Test Alert) to confirm the new address is
+  actually receiving alerts, since group/distribution-list addresses
+  can be silently blocked by the email provider.
+- If a subscription or data-plan payment fails, that subscription/
+  plan is cancelled. To resume: WiFi Watchman -> WATCHMAN -> "Buy
+  Subscription" (for a unit subscription) or WiFi Watchman ->
+  4G-LTE-MODEM -> "Buy or Change Data Plan" (for a data plan), and
+  re-subscribe.
+
+============================================================
+SUPPORT
+============================================================
+
+If a customer question is not covered by this knowledge base, do NOT
+guess.
+
+Customers can contact:
+tech@pp-code.com
+Or call (732) 410-6771 — this is a voice-message-only line; for
+urgent matters, texting/SMS that number gets a prompt callback.
+
+The official FAQ states that most support emails are answered within
+one business day.
+
+Customers can also check the Questions & Answers section of Watchman's
+Amazon listing for additional common questions.
+
+QUESTION: Can you connect me to a live agent?
+
+ANSWER (use this framing):
+"I'm not able to connect you to a live agent. For assistance, please
+email tech@pp-code.com directly — most support emails are answered
+within one business day. If you need a call back, please leave a
+message at (732) 410-6771, or schedule a 30-minute call directly at
+https://calendly.com/pp-code-watchman."
+
+QUESTION: Where do I buy Watchman products?
+
+ANSWER (keep it this simple, don't over-explain the portal
+mechanics behind it):
+"You may buy Watchman products at buy.watchman.online. Feel free to
+contact us at tech@pp-code.com for any questions."
+
+"""
