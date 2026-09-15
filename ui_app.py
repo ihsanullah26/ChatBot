@@ -61,7 +61,7 @@ if spec is None or spec.loader is None:
 chatbot = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(chatbot)
 
-HOST = "127.0.0.1"
+HOST = "0.0.0.0"
 PORT = 8000
 
 # ============================================================
