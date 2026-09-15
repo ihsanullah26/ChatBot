@@ -3,7 +3,7 @@ Watchman Smart Query Chatbox — complete pipeline, one file.
 
 Read top to bottom, in this order:
     SECTION 1: CONFIG              - values YOU must edit (marked MANUAL)
-    SECTION 2: DATABASE CONNECTION - connects to your real Postgres (MANUAL)
+    SECTION 2: DATABASE CONNECTION - connects to your real MySQL (MANUAL)
     SECTION 3: UNIT TYPE MAPPING   - which table holds which unit's logs
     SECTION 4: DATA LAYER          - the only functions that touch the DB
     SECTION 5: SCHEMA BUILDER      - builds the "menu" sent to the LLM
@@ -22,9 +22,9 @@ import json
 import re
 import time
 import os
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
-import psycopg2
-import psycopg2.extras
+import pymysql
 
 # >>> MANUAL: loads OPENROUTER_API_KEY (and anything else you put in a
 # local .env file) into the environment. This is what lets you keep real
@@ -319,51 +319,66 @@ def detect_mood_response(question: str):
 # SECTION 2: DATABASE CONNECTION
 # ------------------------------------------------------------
 # All connection params come from environment variables — none are
-# hardcoded in source. DB_SCHEMA in particular must stay configurable:
-# the real migrated data lives in a non-default Postgres schema
-# (watchman_migration_tmp, not public), and that's exactly the kind of
-# environment-specific fact that shouldn't be baked into application
-# code — if the data ever gets moved/renamed to a cleaner schema later,
-# this is a one-line env var change, not a code change.
+# hardcoded in source. MySQL doesn't have Postgres' separate
+# schema/search_path concept — a MySQL "database" already IS what
+# Postgres calls a schema — so DB_NAME here points directly at the
+# database the real migrated data lives in (previously reached via
+# DB_SCHEMA + a Postgres search_path option; that indirection doesn't
+# apply anymore now that the app talks to MySQL directly).
 #
 # >>> MANUAL: set these before running (e.g. in a .env file loaded by
 # your shell, or exported directly):
 #   export DB_HOST=localhost
-#   export DB_PORT=5432
+#   export DB_PORT=3306
 #   export DB_NAME=mydatabase
-#   export DB_USER=postgres
+#   export DB_USER=root
 #   export DB_PASSWORD=your_real_password
-#   export DB_SCHEMA=watchman_migration_tmp
 # ============================================================
 
 DB_HOST = os.environ.get("DB_HOST", "localhost")
-DB_PORT = int(os.environ.get("DB_PORT", "5432"))
+DB_PORT = int(os.environ.get("DB_PORT", "3306"))
 DB_NAME = os.environ.get("DB_NAME", "mydatabase")
-DB_USER = os.environ.get("DB_USER", "postgres")
+DB_USER = os.environ.get("DB_USER", "root")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "")  # >>> MANUAL
-DB_SCHEMA = os.environ.get("DB_SCHEMA", "watchman_migration_tmp")
 
 if not DB_PASSWORD:
     raise ValueError(
         "No database password set. Set the DB_PASSWORD environment variable before running."
     )
 
-# search_path (rather than qualifying every table name throughout this
-# file and ui_app.py with "watchman_migration_tmp.") is the consistent
-# approach already in use — this just makes the schema name a config
-# value instead of a hardcoded string, so it's set in exactly one place.
 DB_CONFIG = {
     "host": DB_HOST,
     "port": DB_PORT,
     "user": DB_USER,
     "password": DB_PASSWORD,
-    "dbname": DB_NAME,
-    "options": f"-c search_path={DB_SCHEMA},public",
+    "database": DB_NAME,
+    # Plain tuple rows (row[0], row[1], ...) — matches psycopg2's default
+    # cursor shape, which is what every query site in this file already
+    # indexes into. Not DictCursor; changing that would mean rewriting
+    # every fetchone()/fetchall() call site to use column names instead.
+    "cursorclass": pymysql.cursors.Cursor,
+    # Every query in this file is a plain SELECT (confirmed — nothing
+    # here writes to the DB), so there's nothing that strictly needs a
+    # transaction to be committed. autocommit=True avoids relying on
+    # get_connection()'s context manager to commit anything, which
+    # matters because — unlike psycopg2, where `with conn:` commits or
+    # rolls back a transaction — PyMySQL's connection context manager
+    # behaves differently (its __enter__ returns a cursor, not the
+    # connection), which is exactly why get_connection() below is its
+    # own explicit @contextmanager wrapper rather than exposing the raw
+    # pymysql connection object directly to the `with get_connection()
+    # as conn:` pattern already used everywhere in this codebase.
+    "autocommit": True,
 }
 
 
+@contextmanager
 def get_connection():
-    return psycopg2.connect(**DB_CONFIG)
+    conn = pymysql.connect(**DB_CONFIG)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 
 # ============================================================
@@ -563,7 +578,9 @@ def get_subscription_status(user_id: str) -> str:
             row = cur.fetchone()
     if not row or not row[0]:
         return "none"
-    return "active" if row[0] > datetime.now(timezone.utc) else "none"
+        
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    return "active" if row[0] > now_utc else "none"
 
 
 # ============================================================
@@ -1110,12 +1127,14 @@ OPERATORS = {"lt": lambda v, t: v < t, "gt": lambda v, t: v > t, "eq": lambda v,
 
 
 def _date_window(time_range_days, as_of=None):
-    as_of = as_of or datetime.now(timezone.utc)
+    if as_of is None:
+        as_of = datetime.now(timezone.utc).replace(tzinfo=None)
+    elif as_of.tzinfo is not None:
+        as_of = as_of.astimezone(timezone.utc).replace(tzinfo=None)
+
     if time_range_days is None:
-        # "all time" — no lower bound at all, rather than guessing some
-        # sufficiently-early placeholder date. fetch_logs() below drops
-        # the lower bound from the SQL entirely when start is None.
         return None, as_of
+
     start = as_of - timedelta(days=time_range_days)
     return start, as_of
 
