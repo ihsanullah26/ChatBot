@@ -4,11 +4,19 @@ services:
     container_name: chatbot
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      env_file: .env
+      - DB_HOST=chatbot-db
+      - DB_PORT=3306
+      - DB_NAME=mydatabase
+      - DB_USER=root
+      - DB_PASSWORD=mypassword
+      - PYTHONUNBUFFERED=1
     depends_on:
-      - db
-  
+      db:
+        condition: service_healthy
+
   db:
     build:
       context: ./database-dockerfile
@@ -21,7 +29,12 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-pmypassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
 
 volumes:
   db_data:
-    

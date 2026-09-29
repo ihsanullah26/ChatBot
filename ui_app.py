@@ -64,6 +64,11 @@ spec.loader.exec_module(chatbot)
 HOST = "0.0.0.0"
 PORT = 8000
 
+# Only this exact account is treated as an administrator. The password is
+# never hardcoded here; login still validates it against the existing
+# ppcode_usersregister record.
+ADMIN_EMAIL = "704ballyshannondr@gmail.com"
+
 # ============================================================
 # SESSIONS
 # ------------------------------------------------------------
@@ -78,9 +83,13 @@ SESSION_COOKIE_NAME = "watchman_session"
 SESSION_TTL_SECONDS = 8 * 60 * 60  # 8 hours
 
 
-def _new_session(user_id: str, name: str) -> str:
+def _new_session(user_id: str, name: str, email: str) -> str:
     token = secrets.token_urlsafe(32)
-    SESSIONS[token] = {"user_id": user_id, "name": name, "created": time.time()}
+    normalized_email = email.strip().lower()
+    SESSIONS[token] = {
+        "user_id": user_id, "name": name, "email": normalized_email,
+        "is_admin": normalized_email == ADMIN_EMAIL, "created": time.time(),
+    }
     return token
 
 
@@ -136,6 +145,11 @@ button:hover:not(:disabled){background:var(--lantern-deep)}
 button:disabled{opacity:.6;cursor:not-allowed}
 .error{background:#b3413a14;border:1px solid #b3413a3a;color:var(--danger);font-size:13.5px;border-radius:9px;padding:12px 14px;margin-bottom:20px;display:none}
 .error.show{display:block}
+.pw-wrap{position:relative;margin-bottom:22px}
+.pw-wrap input{margin-bottom:0;padding-right:46px}
+button.pw-toggle{position:absolute;top:0;right:0;width:46px;height:100%;padding:0;border:0;background:transparent;color:var(--slate-muted);display:flex;align-items:center;justify-content:center;cursor:pointer}
+button.pw-toggle:hover:not(:disabled){background:transparent;color:var(--ink)}
+button.pw-toggle svg{width:20px;height:20px;pointer-events:none}
 </style>
 </head>
 <body>
@@ -148,7 +162,13 @@ button:disabled{opacity:.6;cursor:not-allowed}
     <label for="email">Email</label>
     <input id="email" type="email" autocomplete="username" required autofocus>
     <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="current-password" required>
+    <div class="pw-wrap">
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button type="button" id="togglePw" class="pw-toggle" aria-label="Show password">
+        <svg id="eyeShow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg id="eyeHide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+      </button>
+    </div>
     <button id="submitBtn" type="submit">Sign in</button>
   </form>
 </div>
@@ -156,6 +176,17 @@ button:disabled{opacity:.6;cursor:not-allowed}
 const form = document.getElementById('loginForm');
 const err = document.getElementById('err');
 const btn = document.getElementById('submitBtn');
+const pwInput = document.getElementById('password');
+const togglePw = document.getElementById('togglePw');
+const eyeShow = document.getElementById('eyeShow');
+const eyeHide = document.getElementById('eyeHide');
+togglePw.addEventListener('click', () => {
+  const show = pwInput.type === 'password';
+  pwInput.type = show ? 'text' : 'password';
+  eyeShow.style.display = show ? 'none' : '';
+  eyeHide.style.display = show ? '' : 'none';
+  togglePw.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+});
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   err.classList.remove('show');
@@ -171,7 +202,7 @@ form.addEventListener('submit', async (e) => {
     });
     const data = await r.json();
     if (r.ok) {
-      window.location.href = '/';
+      window.location.href = data.admin ? '/admin' : '/';
     } else {
       err.textContent = data.error || 'Sign in failed.';
       err.classList.add('show');
@@ -279,7 +310,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <span class="lamp" aria-hidden="true"></span>
   <div><div class="title">Watchman</div><div class="subtitle">Unit support &amp; sensor history</div></div>
 </div>
-<div class="who"><span id="whoami"></span><button id="logoutBtn" class="logout" type="button">Log out</button></div>
+<div class="who"><span id="whoami"></span><a id="adminLink" class="logout" href="/admin" style="display:none;text-decoration:none">Admin history</a><button id="logoutBtn" class="logout" type="button">Log out</button></div>
 </div></header>
 <main class="wrap">
 <div class="config">
@@ -314,6 +345,7 @@ const send=document.getElementById('send');
 const unitId=document.getElementById('unitId');
 const whoami=document.getElementById('whoami');
 const logoutBtn=document.getElementById('logoutBtn');
+const adminLink=document.getElementById('adminLink');
 
 // Auto-grow the question box as text wraps to more lines, instead of
 // scrolling a fixed-height single line sideways (which made typed text
@@ -390,6 +422,7 @@ async function loadWhoAmI(){
  if(r.status === 401){ window.location.href = '/login'; return; }
  const data = await r.json();
  whoami.textContent = data.name ? `Signed in as ${data.name}` : '';
+ if(data.admin) adminLink.style.display = 'inline-block';
 }
 
 // --- Unit dropdown, populated for the LOGGED-IN user only (server
@@ -453,6 +486,79 @@ logoutBtn.addEventListener('click', async ()=>{
 </body></html>'''
 
 
+
+# ============================================================
+# HTML — ADMIN HISTORY
+# ============================================================
+
+ADMIN_HTML = r'''<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Watchman — Admin History</title>
+<style>
+body{margin:0;background:#eef1f4;color:#1e2b38;font-family:-apple-system,"Segoe UI",Arial,sans-serif}
+.header{background:linear-gradient(160deg,#10202e,#17324a);color:#fff;padding:24px 4%}.head{max-width:1500px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.title{font:600 23px Georgia,serif}.sub{font-size:13px;color:#c7d3de;margin-top:3px}.actions{display:flex;gap:8px}.actions a,.actions button{border:1px solid #ffffff40;background:transparent;color:#fff;border-radius:999px;padding:8px 14px;text-decoration:none;cursor:pointer}
+.wrap{width:92%;max-width:1500px;margin:28px auto}.card{background:#fff;border:1px solid #d7dee6;border-radius:12px;overflow:hidden}.toolbar{padding:16px 18px;border-bottom:1px solid #d7dee6;display:flex;gap:12px;align-items:center}.toolbar h1{font-size:18px;margin:0}.count,.status{color:#62748a;font-size:13px}.toolbar button{margin-left:auto;background:#d98c2b;border:0;border-radius:8px;padding:9px 14px;font-weight:600;cursor:pointer}.status{padding:10px 18px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1050px}th,td{text-align:left;vertical-align:top;border-top:1px solid #d7dee6;padding:12px;font-size:13px}th{background:#f6f8fa;color:#62748a;white-space:nowrap}.question,.answer{white-space:pre-wrap}.question{min-width:250px;max-width:430px}.answer{min-width:330px;max-width:560px}.parsed{font:11.5px ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;max-width:330px;word-break:break-word}.empty{text-align:center;padding:35px;color:#62748a}
+.cell-rest.cell-full{display:none}
+.expand-toggle{display:inline-block;margin-top:6px;background:none;border:0;color:#d98c2b;font:600 12px inherit;cursor:pointer;padding:0}
+.expand-toggle:hover{color:#b96f17;text-decoration:underline}
+</style></head><body>
+<header class="header"><div class="head"><div><div class="title">Watchman Admin</div><div class="sub">Customer question &amp; response history</div></div><div class="actions"><a href="/">Open Chat</a><button id="logout">Log out</button></div></div></header>
+<main class="wrap"><section class="card"><div class="toolbar"><h1>Chat history</h1><span id="count" class="count"></span><button id="refresh">Refresh</button></div><div id="status" class="status">Loading…</div>
+<div class="table-wrap"><table><thead><tr><th>Time (UTC)</th><th>User ID</th><th>Unit</th><th>Customer question</th><th>Watchman response</th><th>Parsed query</th></tr></thead><tbody id="rows"></tbody></table><div id="empty" class="empty" style="display:none">No chat logs found yet.</div></div>
+</section></main>
+<script>
+const rows=document.getElementById('rows'),statusEl=document.getElementById('status'),countEl=document.getElementById('count'),empty=document.getElementById('empty');
+const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+// Collapses any cell whose content runs more than 5 rows past its first
+// line (this is what happens for count_threshold_crossings answers with
+// hundreds/thousands of matching readings — see the bug this fixes).
+// The header line (e.g. "Temperature went below 70 3790 time(s)...")
+// always stays visible; only the bulleted rows beneath it collapse.
+// Both the collapsed and full versions are rendered up front (one
+// hidden via CSS) rather than stored in a data attribute, so there's
+// no re-escaping/quoting to get wrong when the toggle fires.
+function renderCell(text, cls, maxExtraRows=5){
+  const escaped = esc(text);
+  const lines = escaped.split('\n');
+  if(lines.length <= 1 + maxExtraRows){
+    return `<div class="${cls}">${escaped}</div>`;
+  }
+  const head = lines[0];
+  const collapsedRest = lines.slice(1, 1 + maxExtraRows).join('\n');
+  const fullRest = lines.slice(1).join('\n');
+  const hiddenCount = lines.length - 1 - maxExtraRows;
+  return `<div class="${cls}">${head}\n<span class="cell-rest cell-collapsed" style="display:inline">${collapsedRest}</span><span class="cell-rest cell-full" style="display:none">${fullRest}</span>
+<button type="button" class="expand-toggle" data-state="collapsed" data-collapsed-label="Show ${hiddenCount} more row(s)" data-expanded-label="Show fewer rows">Show ${hiddenCount} more row(s)</button></div>`;
+}
+
+async function loadLogs(){statusEl.textContent='Loading…';rows.innerHTML='';try{const r=await fetch('/api/admin/logs');if(r.status===401){location.href='/login';return}if(r.status===403){statusEl.textContent='Admin access required.';return}const d=await r.json();if(!r.ok)throw Error(d.error||'Could not load logs.');countEl.textContent=`${d.logs.length} record(s)`;if(!d.logs.length){empty.style.display='block';statusEl.textContent='';return}rows.innerHTML=d.logs.map(x=>`<tr><td>${esc(x.timestamp)}</td><td>${esc(x.user_id)}</td><td>#${esc(x.unit_id)}</td><td>${renderCell(x.question,'question')}</td><td>${renderCell(x.answer,'answer')}</td><td>${renderCell(JSON.stringify(x.parsed??null,null,2),'parsed')}</td></tr>`).join('');statusEl.textContent='Showing the most recent 500 records.'}catch(e){statusEl.textContent=e.message||'Could not load logs.'}}
+
+// Delegated click handler — rows are re-rendered wholesale on every
+// loadLogs() call, so binding once on the (stable) tbody instead of
+// per-button avoids rebinding listeners on every refresh.
+rows.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.expand-toggle');
+  if(!btn) return;
+  const expanded = btn.dataset.state === 'expanded';
+  const collapsedEl = btn.parentElement.querySelector('.cell-collapsed');
+  const fullEl = btn.parentElement.querySelector('.cell-full');
+  if(expanded){
+    collapsedEl.style.display = 'inline';
+    fullEl.style.display = 'none';
+    btn.textContent = btn.dataset.collapsedLabel;
+    btn.dataset.state = 'collapsed';
+  } else {
+    collapsedEl.style.display = 'none';
+    fullEl.style.display = 'inline';
+    btn.textContent = btn.dataset.expandedLabel;
+    btn.dataset.state = 'expanded';
+  }
+});
+
+document.getElementById('refresh').onclick=loadLogs;document.getElementById('logout').onclick=async()=>{await fetch('/logout',{method:'POST'});location.href='/login'};loadLogs();
+</script></body></html>'''
 class Handler(BaseHTTPRequestHandler):
     def _send(self, status, body, content_type="text/html; charset=utf-8", extra_headers=None):
         encoded = body.encode("utf-8")
@@ -515,7 +621,13 @@ class Handler(BaseHTTPRequestHandler):
             if not session:
                 self._send(401, json.dumps({"error": "Not signed in."}), "application/json")
                 return
-            self._send(200, json.dumps({"user_id": session["user_id"], "name": session["name"]}), "application/json")
+            self._send(
+                200,
+                json.dumps({"user_id": session["user_id"], "name": session["name"],
+                            "email": session.get("email", ""),
+                            "admin": bool(session.get("is_admin"))}),
+                "application/json",
+            )
             return
 
         if self.path == "/api/units":
@@ -523,6 +635,26 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(401, json.dumps({"error": "Not signed in."}), "application/json")
                 return
             self._handle_get_units(session["user_id"])
+            return
+
+        if self.path == "/admin":
+            if not session:
+                self._redirect("/login")
+                return
+            if not session.get("is_admin"):
+                self._send(403, "Admin access required.", "text/plain; charset=utf-8")
+                return
+            self._send(200, ADMIN_HTML)
+            return
+
+        if self.path == "/api/admin/logs":
+            if not session:
+                self._send(401, json.dumps({"error": "Not signed in."}), "application/json")
+                return
+            if not session.get("is_admin"):
+                self._send(403, json.dumps({"error": "Admin access required."}), "application/json")
+                return
+            self._handle_admin_logs()
             return
 
         self._send(404, "Not found", "text/plain; charset=utf-8")
@@ -651,10 +783,11 @@ class Handler(BaseHTTPRequestHandler):
                 return
 
             user_id, name, _ = row
-            token = _new_session(user_id, name)
+            token = _new_session(user_id, name, email)
+            is_admin = email.strip().lower() == ADMIN_EMAIL
             self._send(
                 200,
-                json.dumps({"ok": True}),
+                json.dumps({"ok": True, "admin": is_admin}),
                 "application/json",
                 extra_headers=[("Set-Cookie", self._session_cookie_header(token, max_age=SESSION_TTL_SECONDS))],
             )
@@ -676,6 +809,36 @@ class Handler(BaseHTTPRequestHandler):
             "application/json",
             extra_headers=[("Set-Cookie", self._session_cookie_header("", max_age=0))],
         )
+
+    def _handle_admin_logs(self):
+        """Read chat_logs.jsonl and expose only recent records to the admin."""
+        log_path = Path(chatbot.CHAT_LOG_PATH)
+        if not log_path.is_absolute():
+            log_path = Path.cwd() / log_path
+        logs = []
+        try:
+            if log_path.is_file():
+                with log_path.open("r", encoding="utf-8") as f:
+                    for line in f:
+                        try:
+                            record = json.loads(line)
+                            if isinstance(record, dict):
+                                logs.append({
+                                    "timestamp": record.get("timestamp", ""),
+                                    "user_id": record.get("user_id", ""),
+                                    "unit_id": record.get("unit_id", ""),
+                                    "question": record.get("question", ""),
+                                    "parsed": record.get("parsed"),
+                                    "answer": record.get("answer", ""),
+                                })
+                        except (json.JSONDecodeError, TypeError):
+                            continue
+            logs = logs[-500:]
+            logs.reverse()
+            self._send(200, json.dumps({"logs": logs}, ensure_ascii=False), "application/json")
+        except OSError as exc:
+            print(f"[UI error] /api/admin/logs {type(exc).__name__}: {exc}")
+            self._send(500, json.dumps({"error": "Could not read chat history."}), "application/json")
 
     def _handle_chat(self):
         session = self._get_session()

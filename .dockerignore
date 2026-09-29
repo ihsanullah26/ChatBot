@@ -1,1 +1,9 @@
 pp-code-db-0926.sql
+*.sql
+database-dockerfile/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.git
+.gitignore

@@ -335,11 +335,11 @@ def detect_mood_response(question: str):
 #   export DB_PASSWORD=your_real_password
 # ============================================================
 
-DB_HOST = os.environ.get("DB_HOST", "localhost")
+DB_HOST = os.environ.get("DB_HOST", "chatbot-db")
 DB_PORT = int(os.environ.get("DB_PORT", "3306"))
-DB_NAME = os.environ.get("DB_NAME", "mydatabase")
+DB_NAME = os.environ.get("DB_NAME", "mydatabase")  # >>> MANUAL
 DB_USER = os.environ.get("DB_USER", "root")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "")  # >>> MANUAL
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "mypassword")  # >>> MANUAL
 
 if not DB_PASSWORD:
     raise ValueError(
@@ -545,6 +545,33 @@ def fetch_logs(unit_id: int, start, end: str) -> list[dict]:
     return logs
 
 
+def get_unit_name(unit_id: int):
+    """Return the selected Watchman unit's display name/address.
+
+    This matches the UI's existing unit_name lookup. The value comes from
+    the database; the LLM never invents or supplies the name.
+    """
+    config = _get_unit_table_config(unit_id)
+    primary_table = config["table"]
+    tables = [primary_table] + [table for table in _TABLE_COLUMNS if table != primary_table]
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            for table in tables:
+                try:
+                    cur.execute(
+                        f"SELECT address FROM {table} "
+                        f"WHERE splog_id = %s AND address IS NOT NULL AND address <> '' "
+                        f"ORDER BY datetime DESC LIMIT 1",
+                        (unit_id,),
+                    )
+                    row = cur.fetchone()
+                    if row and row[0]:
+                        return str(row[0])
+                except Exception:
+                    continue
+    return None
+
+
 def unit_belongs_to_user(unit_id: int, user_id: str) -> bool:
     # FIXED (previously a known bug — user_id was accepted but never
     # checked, so any user_id "passed" for any real unit_id). The real
@@ -601,7 +628,17 @@ QUERY_TYPE_DESCRIPTIONS = (
     "min_max = customer asks for the HIGHEST or LOWEST single reading in a "
     "period, or the full RANGE (both). Use the extreme field to say which. "
     "average = customer asks for a MEAN/TYPICAL value over a period. "
-    "current_status = customer asks about the CURRENT/RIGHT NOW reading. "
+    "current_status = customer asks about the CURRENT/RIGHT NOW reading, "
+    "usually to check it against a condition (e.g. 'is the temperature "
+    "above 30 right now?'). "
+    "latest_record = customer asks for the LATEST/MOST RECENT reading of a "
+    "metric with NO condition attached (e.g. 'what was the latest "
+    "temperature record?', 'what's the most recent humidity reading?', "
+    "'show me the last recorded value'). Unlike current_status, this is "
+    "NOT restricted to the last 24 hours — it should find the true most "
+    "recent record in the unit's entire history, however old that is. Use "
+    "current_status instead only when the customer is checking the "
+    "reading against a threshold/condition. "
     "smalltalk = a short social/conversational or emotional remark aimed "
     "AT the bot/conversation itself — a greeting, thanks, acknowledgment, "
     "reaction, OR a hostile/dismissive remark telling the bot to go away, "
@@ -617,7 +654,11 @@ QUERY_TYPE_DESCRIPTIONS = (
     "WEBSITE ITSELF rather than this unit's own sensor history — e.g. "
     "pricing, subscriptions, product types, setup, alerts, warranty, or "
     "portal features. Use this instead of not_applicable for anything a "
-    "customer support page would normally answer."
+    "customer support page would normally answer. "
+    "unit_name = customer asks for the NAME/ADDRESS/LABEL of the currently "
+    "selected Watchman unit, e.g. 'What is the Watchman unit name?' or "
+    "'What is the name of this unit?'. The application supplies the actual "
+    "selected unit name; do not invent one."
 )
 
 
@@ -632,7 +673,8 @@ def build_schema_for_unit(unit_id: int) -> dict:
                     "type": "string",
                     "enum": ["count_threshold_crossings", "largest_change",
                               "min_max", "average", "current_status",
-                              "general_question", "smalltalk", "not_applicable"],
+                              "latest_record", "general_question", "unit_name",
+                              "smalltalk", "not_applicable"],
                     "description": QUERY_TYPE_DESCRIPTIONS,
                 },
                 "metric": {
@@ -642,12 +684,31 @@ def build_schema_for_unit(unit_id: int) -> dict:
                 },
                 "operator": {
                     "type": "string",
-                    "enum": ["lt", "gt", "eq"],
-                    "description": "Only for count_threshold_crossings / current_status.",
+                    "enum": ["lt", "gt", "eq", "between"],
+                    "description": (
+                        "Only for count_threshold_crossings / current_status. "
+                        "Use 'between' when the customer gives a RANGE with "
+                        "two numbers (e.g. 'between 60 and 70', 'above 60 "
+                        "and below 70', 'from 60 to 70') — pair it with "
+                        "threshold_low and threshold_high instead of "
+                        "threshold. The range is INCLUSIVE of both "
+                        "endpoints: 'between 60 and 70' matches every "
+                        "reading that is 60, 61, ... up to and including 70 "
+                        "— not just values strictly greater than 60 and "
+                        "strictly less than 70."
+                    ),
                 },
                 "threshold": {
                     "type": "number",
-                    "description": "Only for count_threshold_crossings / current_status.",
+                    "description": "Only for operator lt/gt/eq. Omit when operator is 'between'.",
+                },
+                "threshold_low": {
+                    "type": "number",
+                    "description": "Only when operator is 'between' — the lower (inclusive) bound of the range.",
+                },
+                "threshold_high": {
+                    "type": "number",
+                    "description": "Only when operator is 'between' — the upper (inclusive) bound of the range.",
                 },
                 "time_range_days": {
                     "type": "integer",
@@ -921,6 +982,10 @@ def parse_question(question: str, schema: dict, max_retries: int = 3) -> dict:
         '{"query_type": "general_question", "sentiment": "neutral"}\n'
         'Q: "How much does the premium plan cost?" -> '
         '{"query_type": "general_question", "sentiment": "neutral"}\n'
+        'Q: "What is the Watchman unit name?" -> '
+        '{"query_type": "unit_name", "sentiment": "neutral"}\n'
+        'Q: "What is the name of this unit?" -> '
+        '{"query_type": "unit_name", "sentiment": "neutral"}\n'
         'Q: "Is there a mobile app for iOS?" -> '
         '{"query_type": "general_question", "sentiment": "neutral"}\n'
         'Q: "What\'s the battery life on a power bank instead of USB?" -> '
@@ -964,6 +1029,20 @@ def parse_question(question: str, schema: dict, max_retries: int = 3) -> dict:
         'Q: "on which day did the temperature go above 75?" -> '
         '{"query_type": "count_threshold_crossings", "metric": "temperature", '
         '"operator": "gt", "threshold": 75, "sentiment": "neutral"}\n'
+        'Q: "On which day the temperature was goes above 60 and below 70?" -> '
+        '{"query_type": "count_threshold_crossings", "metric": "temperature", '
+        '"operator": "between", "threshold_low": 60, "threshold_high": 70, "sentiment": "neutral"}\n'
+        'Q: "how many times was humidity between 40 and 50 this week?" -> '
+        '{"query_type": "count_threshold_crossings", "metric": "humidity", '
+        '"operator": "between", "threshold_low": 40, "threshold_high": 50, '
+        '"time_range_days": 7, "time_range_phrase": "this week", "sentiment": "neutral"}\n'
+        'Q: "is the temperature currently between 60 and 70?" -> '
+        '{"query_type": "current_status", "metric": "temperature", '
+        '"operator": "between", "threshold_low": 60, "threshold_high": 70, "sentiment": "neutral"}\n'
+        'Q: "what was the latest record for temperature?" -> '
+        '{"query_type": "latest_record", "metric": "temperature", "sentiment": "neutral"}\n'
+        'Q: "what is the most recent humidity reading?" -> '
+        '{"query_type": "latest_record", "metric": "humidity", "sentiment": "neutral"}\n'
         'Q: "which day had the biggest temperature swing this month?" -> '
         '{"query_type": "largest_change", "metric": "temperature", '
         '"time_range_days": 30, "time_range_phrase": "this month", "sentiment": "neutral"}\n\n'
@@ -981,6 +1060,8 @@ def parse_question(question: str, schema: dict, max_retries: int = 3) -> dict:
         "Any question about the Watchman product, its features, pricing, "
         "compatibility, or capabilities is general_question, REGARDLESS of "
         "whether you personally know the answer — a separate step handles "
+        "answering. If the customer asks for the selected/current unit's "
+        "name, address, or label, use unit_name instead of general_question. "
         "answering (and will say 'I don't know' there if needed, not here). "
         "query_type is REQUIRED in every response, even for short, "
         "informal, fragment-style, or ambiguous input. Never return an "
@@ -1126,6 +1207,16 @@ def answer_general_question(question: str, unit_id: int = None) -> str:
 OPERATORS = {"lt": lambda v, t: v < t, "gt": lambda v, t: v > t, "eq": lambda v, t: v == t}
 
 
+def _matches_operator(value, operator, threshold=None, threshold_low=None, threshold_high=None) -> bool:
+    """'between' is inclusive of both endpoints — a reading equal to
+    threshold_low or threshold_high counts as a match, not just values
+    strictly inside the range. Kept separate from OPERATORS above since
+    it needs two bounds instead of one."""
+    if operator == "between":
+        return threshold_low <= value <= threshold_high
+    return OPERATORS[operator](value, threshold)
+
+
 def _date_window(time_range_days, as_of=None):
     if as_of is None:
         as_of = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -1139,13 +1230,15 @@ def _date_window(time_range_days, as_of=None):
     return start, as_of
 
 
-def build_count_query(unit_id, metric, operator, threshold, time_range_days, as_of=None, **_):
+def build_count_query(unit_id, metric, operator, time_range_days, threshold=None,
+                       threshold_low=None, threshold_high=None, as_of=None, **_):
     start, end = _date_window(time_range_days, as_of)
     readings = [(r["timestamp"], r["value"]) for r in fetch_logs(unit_id, start, end) if r["metric"] == metric]
-    op = OPERATORS[operator]
-    matches = [(ts, v) for ts, v in readings if op(v, threshold)]
+    matches = [(ts, v) for ts, v in readings
+               if _matches_operator(v, operator, threshold, threshold_low, threshold_high)]
     return {"count": len(matches), "metric": metric, "operator": operator,
-            "threshold": threshold, "days": time_range_days, "matches": matches}
+            "threshold": threshold, "threshold_low": threshold_low, "threshold_high": threshold_high,
+            "days": time_range_days, "matches": matches}
 
 
 def build_largest_change_query(unit_id, metric, time_range_days, as_of=None, **_):
@@ -1182,17 +1275,36 @@ def build_average_query(unit_id, metric, time_range_days, as_of=None, **_):
     return {"average": avg, "count": len(readings), "metric": metric, "days": time_range_days}
 
 
-def build_current_status_query(unit_id, metric, operator=None, threshold=None, as_of=None, **_):
+def build_current_status_query(unit_id, metric, operator=None, threshold=None,
+                                threshold_low=None, threshold_high=None, as_of=None, **_):
     start, end = _date_window(1, as_of)
     matching = [r for r in fetch_logs(unit_id, start, end) if r["metric"] == metric]
     if not matching:
         return {"value": None, "metric": metric}
     latest = max(matching, key=lambda r: r["timestamp"])
     result = {"value": latest["value"], "metric": metric, "timestamp": latest["timestamp"]}
-    if operator and threshold is not None:
-        result["meets_condition"] = OPERATORS[operator](latest["value"], threshold)
-        result["operator"], result["threshold"] = operator, threshold
+    has_condition = operator == "between" or (operator and threshold is not None)
+    if has_condition:
+        result["meets_condition"] = _matches_operator(
+            latest["value"], operator, threshold, threshold_low, threshold_high)
+        result["operator"] = operator
+        result["threshold"] = threshold
+        result["threshold_low"] = threshold_low
+        result["threshold_high"] = threshold_high
     return result
+
+
+def build_latest_record_query(unit_id, metric, as_of=None, **_):
+    """No time-window restriction at all (unlike current_status, which
+    only looks at the last 24 hours) — this walks the unit's ENTIRE
+    history to find the true most recent record for the metric, however
+    old it is."""
+    start, end = _date_window(None, as_of)
+    matching = [r for r in fetch_logs(unit_id, start, end) if r["metric"] == metric]
+    if not matching:
+        return {"value": None, "metric": metric}
+    latest = max(matching, key=lambda r: r["timestamp"])
+    return {"value": latest["value"], "metric": metric, "timestamp": latest["timestamp"]}
 
 
 ROUTER = {
@@ -1201,6 +1313,7 @@ ROUTER = {
     "min_max": build_min_max_query,
     "average": build_average_query,
     "current_status": build_current_status_query,
+    "latest_record": build_latest_record_query,
 }
 
 
@@ -1210,19 +1323,23 @@ def run_query(unit_id: int, parsed: dict, as_of=None) -> dict:
     # "sentiment" (and any other future metadata field on `parsed`) must
     # NOT be forwarded here — it broke build_count_query() previously,
     # since that's the one builder without a **_ catch-all.
-    QUERY_PARAM_KEYS = {"metric", "operator", "threshold", "time_range_days", "extreme"}
+    QUERY_PARAM_KEYS = {"metric", "operator", "threshold", "threshold_low",
+                         "threshold_high", "time_range_days", "extreme"}
     kwargs = {k: v for k, v in parsed.items() if k in QUERY_PARAM_KEYS}
 
-    # Every query type except current_status needs a time window, but
-    # the LLM sometimes omits time_range_days when the customer didn't
-    # mention a period at all (e.g. "on which day does it go above 75?"
-    # with no "this week"/"in the last month"). Rather than trust the
-    # model to always remember to fill in a default, enforce one here
-    # deterministically — same "code computes, LLM only classifies"
-    # principle as everywhere else in this pipeline. all_time overrides
-    # this entirely: time_range_days becomes None, which _date_window /
-    # fetch_logs treat as "no lower bound at all".
-    if query_type != "current_status":
+    # Every query type except current_status and latest_record needs a
+    # time window, but the LLM sometimes omits time_range_days when the
+    # customer didn't mention a period at all (e.g. "on which day does
+    # it go above 75?" with no "this week"/"in the last month"). Rather
+    # than trust the model to always remember to fill in a default,
+    # enforce one here deterministically — same "code computes, LLM only
+    # classifies" principle as everywhere else in this pipeline. all_time
+    # overrides this entirely: time_range_days becomes None, which
+    # _date_window / fetch_logs treat as "no lower bound at all".
+    # latest_record ALWAYS searches the unit's entire history regardless
+    # of what the LLM filled in here — its builder doesn't take
+    # time_range_days at all — so it's excluded the same as current_status.
+    if query_type not in ("current_status", "latest_record"):
         if parsed.get("all_time"):
             kwargs["time_range_days"] = None
         elif "time_range_days" not in kwargs:
@@ -1284,8 +1401,13 @@ def _period_text(result: dict) -> str:
 
 def format_answer(query_type: str, result: dict) -> str:
     if query_type == "count_threshold_crossings":
-        header = (f"{result['metric'].capitalize()} went {OPERATOR_WORDS[result['operator']]} "
-                   f"{result['threshold']} {result['count']} time(s) over {_period_text(result)}.")
+        if result["operator"] == "between":
+            header = (f"{result['metric'].capitalize()} was between "
+                       f"{result['threshold_low']} and {result['threshold_high']} "
+                       f"(inclusive) {result['count']} time(s) over {_period_text(result)}.")
+        else:
+            header = (f"{result['metric'].capitalize()} went {OPERATOR_WORDS[result['operator']]} "
+                       f"{result['threshold']} {result['count']} time(s) over {_period_text(result)}.")
         if result["count"] == 0:
             return header
         lines = [f"  • {_format_timestamp(ts)} — {value}" for ts, value in result["matches"]]
@@ -1321,8 +1443,17 @@ def format_answer(query_type: str, result: dict) -> str:
                 f"(at {_format_timestamp(result['timestamp'])}).")
         if "meets_condition" in result:
             verdict = "is" if result["meets_condition"] else "is not"
-            base += f" That {verdict} {OPERATOR_WORDS[result['operator']]} {result['threshold']}."
+            if result["operator"] == "between":
+                base += (f" That {verdict} between {result['threshold_low']} "
+                         f"and {result['threshold_high']} (inclusive).")
+            else:
+                base += f" That {verdict} {OPERATOR_WORDS[result['operator']]} {result['threshold']}."
         return base
+    if query_type == "latest_record":
+        if result["value"] is None:
+            return f"No {result['metric']} data has been recorded for this unit yet."
+        return (f"The latest {result['metric']} record was {result['value']} "
+                f"(at {_format_timestamp(result['timestamp'])}).")
     return "Sorry, I couldn't compute an answer for that question."
 
 
@@ -1330,10 +1461,14 @@ def format_answer(query_type: str, result: dict) -> str:
 # SECTION 9: MAIN PIPELINE
 # ============================================================
 
-ALLOWED_KEYS = {"query_type", "metric", "operator", "threshold", "time_range_days",
-                 "time_range_phrase", "all_time", "sentiment", "extreme"}
+ALLOWED_KEYS = {"query_type", "metric", "operator", "threshold", "threshold_low",
+                 "threshold_high", "time_range_days", "time_range_phrase",
+                 "all_time", "sentiment", "extreme"}
 ALLOWED_QUERY_TYPES = set(ROUTER.keys())
-ALLOWED_OPERATORS = set(OPERATORS.keys())
+# "between" isn't in OPERATORS itself (it needs two bounds, handled by
+# _matches_operator instead of a single-arg lambda) but it's still a
+# valid value for the parsed "operator" field.
+ALLOWED_OPERATORS = set(OPERATORS.keys()) | {"between"}
 
 # >>> MANUAL: where chat logs get saved. Each line is one JSON record:
 # timestamp, user_id, unit_id, question, parsed classification, and the
@@ -1389,6 +1524,13 @@ def _answer_question_core(user_id: str, unit_id: int, question: str) -> tuple:
     if query_type is None:
         return "Sorry, I couldn't understand that question — try rephrasing?", parsed
 
+    # The selected unit's name is application data, not LLM-generated data.
+    if query_type == "unit_name":
+        unit_name = get_unit_name(unit_id)
+        if unit_name:
+            return f"The selected Watchman unit name is: {unit_name}", parsed
+        return f"I couldn't find a name for Watchman unit #{unit_id}.", parsed
+
     # The LLM explicitly said this question isn't about sensor history —
     # decline cleanly. Checked BEFORE the ALLOWED_QUERY_TYPES check below,
     # since not_applicable/general_question are valid choices but have no
@@ -1427,6 +1569,15 @@ def _answer_question_core(user_id: str, unit_id: int, question: str) -> tuple:
     if query_type not in ALLOWED_QUERY_TYPES:
         return "I can currently answer questions about counts, averages, extremes, and changes — try rephrasing?", parsed
     if "operator" in parsed and parsed["operator"] not in ALLOWED_OPERATORS:
+        return "Sorry, I couldn't understand that question — try rephrasing?", parsed
+
+    # "between" needs both bounds to mean anything — a model that picks
+    # the right operator but forgets one bound (or gives a single
+    # "threshold" instead) shouldn't silently crash inside the query
+    # engine's <= comparison further downstream.
+    if parsed.get("operator") == "between" and (
+        parsed.get("threshold_low") is None or parsed.get("threshold_high") is None
+    ):
         return "Sorry, I couldn't understand that question — try rephrasing?", parsed
 
     # Never trust that the LLM actually stayed within the metric enum it

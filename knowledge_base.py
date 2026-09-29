@@ -3,13 +3,10 @@ ABOUT WATCHMAN
 Watchman (by pp-Code / Watchman Online LLC) makes WiFi-connected IoT
 sensors that monitor temperature, humidity, pressure, gas, water leaks,
 and noise, with alerting, aimed at protecting homes, rentals, freezers,
-wine cellars, storage units, and offices. The company also builds
-longer-range LoRa sensors (up to about 0.6 miles / 1km range, versus
-roughly 75ft for the WiFi products).
+wine cellars, storage units, and offices. 
 
 PRODUCT LINEUP
-- Standard Watchman (with or without display): temperature, humidity.
-- Standard Watchman with Pressure Sensor: temperature, humidity, pressure.
+- Standard Watchman: temperature, humidity.
 - Watchman with External Probe (1-3 probes): temperature plus up to
   three separately-named probe temperatures.
 - Watchman for pool/spa (10k NTC thermistor probe): temperature.
@@ -23,16 +20,11 @@ PRODUCT LINEUP
 - Watchman with ON/OFF Relay: temperature, humidity, and a relay that
   can operate an appliance according to configured temperature/humidity
   values.
-- Long-range LoRa Watchman products support sensor deployments up to
-  approximately 1km / 0.6 miles. WiFi products have a range of roughly
-  75ft.
 - Accessories include a 4G-LTE modem and a plug-and-play WiFi Gateway.
 - Some products offer SD card local data storage.
 
 MOBILE APPS
 - The Watchman Online app is available for both Android and iOS.
-  - Android: Google Play Store, package com.netstratum.watchman.
-  - iOS: Apple App Store, app id 1434683526.
 - The app provides access to logs, alerts, and Real Time Reading in
   addition to the web portal.
 
@@ -44,23 +36,18 @@ WEBSITE AND PORTAL NAVIGATION
 - Purchase/checkout site: buy.watchman.online (buy or lease units,
   product selection guide, accessories like the WiFi Gateway).
 - Key portal pages:
-  - MANAGE-WATCHMAN: add/edit/delete/transfer units, rename locations,
-    view WiFi signal strength (firmware v17+), name probes.
+  - MANAGE-WATCHMAN: add/edit/delete/transfer units, rename location
   - Buy Subscription: monthly/yearly/BuyOut plans, Tiered/Bundled
     subscription options for 5+ units.
-  - Alert Suppression settings: adjust suppression duration and the
-    safety-override temperature.
   - Chart page: graph visualization of log history, daily Min/Max
     (subscribed units).
 - Setup guide: watchman.online/setup.
-- Product Selection Guide (helps choose which Watchman type fits a
-  use case): buy.watchman.online/SelectionGuide.html.
 - To register a new account: pp-code.com, or the "Register" link from
   watchman.online.
 - The portal login page supports "Save Email" for faster future logins.
 
 PRICING AND PLANS
-- WiFi Watchman unit price starts at $37; price varies by product type.
+- WiFi Watchman unit price starts at $42; price varies by product type.
 - WiFi Gateway accessory: $20.
 - Subscription (per Watchman unit, optional):
   - $2.49/month, or $19.99/year.
@@ -71,9 +58,7 @@ PRICING AND PLANS
     customers with 5+ units, available on the "Buy Subscription" page
     in the portal. Also allows "rolling" a subscription from one unit
     to another (except BuyOut).
-  - Additional text-alert phone numbers: $1.50/month (or $18/year)
-    for 1 additional number, $3.00/month (or $36/year) for 2, $4.50/
-    month (or $54/year) for 3.
+  - Additional text-alert phone numbers: $1.50/month/number (or $18/year)
 - Basic features (no subscription needed, included with every unit):
   - Portal/app access for logs and alert configuration.
   - Hourly logging (immediate log on sudden change).
@@ -119,7 +104,7 @@ TECHNICAL SPECIFICATIONS
 - Protect Watchman from direct sunlight and keep ambient temperature
   between approximately 0°F and 150°F.
 - Suggested power-bank current budget:
-  150mA for regular units,
+  150mA for standard units,
   200mA for units with a 1M probe,
   300mA for other unit types.
 
@@ -133,12 +118,8 @@ Customer testing on a regular Watchman reported:
   settling to approximately 70mA.
 
 FIRMWARE
-- Watchman units showing firmware version 3.1.3 can be upgraded to 3.1.4
-  locally using a PC/laptop and the provided instructions.
-- Other Watchman units use firmware version 15, or version 17 for some
-  types.
-- Firmware cannot be remotely pushed to those units.
-- Customers can send the unit to pp-Code and pay $15 for shipping both
+- Watchman units showing firmware version 4.x.x can be upgraded over the air. Go to watchman's IP address on the browser and go to Update tab. It offers option to check and update to the latest firmware.
+- For other Watchman units that use firmware version 13/14/15/17, they cannot be remotely upgraded. Customers can send the unit to pp-Code and pay $15 for shipping both
   ways to have the firmware upgraded.
 - Computer-savvy customers can request the firmware files at no cost and
   perform the upgrade themselves at their own risk.
@@ -191,6 +172,7 @@ Possible causes include:
 QUESTION: How do I reset Watchman to factory default?
 
 ANSWER:
+You do not need to factory-reset Watchman for any of it's functionning. However, if you still want to, please follow the steps as:
 1. Restart Watchman by unplugging and plugging it back in.
 2. Using a tablet/mobile device, connect to the WiFi network named
    ppC_noInternet_xxxxxx.
@@ -202,8 +184,6 @@ ANSWER:
 QUESTION: How do I change the WiFi settings?
 
 ANSWER:
-You do not need to factory-reset Watchman.
-
 Simply perform the setup process again. The new WiFi credentials will
 overwrite the old credentials.
 
@@ -239,19 +219,19 @@ Watchman to the new WiFi?
 ANSWER:
 It depends on whether the WiFi network name (SSID) and password
 stayed the same or changed:
-- If your new internet provider kept the SAME WiFi name and
+- If your new internet provider kept the same WiFi name and
   password you had before (e.g. you kept using the same router, or
   your provider preserved your settings), Watchman does NOT need to
   be reconnected — it already has those credentials stored.
-- If the WiFi name and/or password CHANGED (e.g. a new router with
-  a new default SSID/password), then YES, you'll need to redo the
+- If the WiFi name and/or password changed (e.g. a new router with
+  a new SSID/password), then YES, you'll need to redo the
   WiFi setup with the new credentials. You do NOT need to
   re-register or re-activate the Watchman on the portal — just
   perform the standard WiFi setup process again, entering the new
   network's SSID and password; the new credentials overwrite the
   old ones.
 
-Full step-by-step setup instructions are at watchman.online/setup.
+Full step-by-step setup instructions are at watchman.online/setup 
 
 QUESTION: Will Watchman work with a WiFi extender?
 
@@ -335,18 +315,15 @@ Once connected to WiFi, Watchman communicates externally in several ways.
    Depending on the unit/features, collected data includes:
    - temperature,
    - humidity,
-   - gas level,
-   - count of active devices when Party-Detect is enabled.
+   - gas level
+   - water
+   - noise level
 
 2. Syslog:
    Watchman sends unit health and event logs to the pp-Code syslog server.
 
 3. NTP:
    Watchman communicates with an internet NTP server to maintain its clock.
-
-Watchman does not perform internal LAN communication unless Party-Detect
-is enabled. With Party-Detect enabled, it sends pings to connected LAN
-devices to help determine the number of active devices.
 
 QUESTION: What firewall ports need to be opened for Watchman?
 
@@ -477,9 +454,7 @@ Watchman supports GET-based APIs.
 QUESTION: How can I get current Watchman statistics in JSON format?
 
 ANSWER:
-For firmware version 13 or higher, use:
-
-http://<IP address>/<key>&Stats/json
+Use: http://<IP address>/<key>&Stats/json
 
 Example:
 
@@ -488,7 +463,8 @@ GET /aa7777063116&Stats/json
 The response contains information such as:
 - temperature,
 - humidity,
-- active-device count.
+- etc
+
 
 Example response:
 
@@ -497,46 +473,18 @@ Example response:
   "Stats": {
     "Temp":"77.9F",
     "Humi":"66.1%",
-    "ActDev":"1"
   }
 }
 
 QUESTION: How can I read the current statistics?
 
 ANSWER:
-For firmware version 9.1 or higher:
 
-http://<IP address>/<key>&Stats
+Use: http://<IP address>/<key>&Stats
 
 Example response:
 
-Temp:87.44F Humi:48.3% ActDev:0
-
-QUESTION: How can I read the current temperature on older firmware?
-
-ANSWER:
-For firmware version 9 or lower:
-
-http://<IP address>/<key>&Temperature
-
-QUESTION: How can I read the current humidity on older firmware?
-
-ANSWER:
-For firmware version 9 or lower:
-
-http://<IP address>/<key>&Humidity
-
-QUESTION: How can I read the current number of active devices?
-
-ANSWER:
-For firmware version 9 or lower:
-
-http://<IP address>/<key>&ActiveDevices
-
-Party-Detect must be enabled for this API to return the active-device
-count.
-
-The active-device count is recycled every hour.
+Temp:87.44F Humi:48.3% 
 
 QUESTION: What is the IP address used in the API?
 
@@ -567,14 +515,8 @@ FAQ — REAL TIME READING
 QUESTION: What is Real Time Reading?
 
 ANSWER:
-Watchman normally sends logs every hour, or every 15 minutes with a
-subscription.
-
-Watchman internally reads its sensors every minute and reacts to sudden
-changes immediately.
-
 Real Time Reading provides an option to query the Watchman directly and
-retrieve its current readings using the same API mechanism.
+retrieve its current readings using API mechanism.
 
 QUESTION: Does Real Time Reading require port forwarding?
 
@@ -843,9 +785,9 @@ IMPORTANT DISAMBIGUATION — two different things both called
    at pp-code.com/?rt=login/register before the transfer can
    proceed. This is about ownership of the physical unit.
 2. ROLLING A SUBSCRIPTION BETWEEN UNITS (moving which Watchman a
-   Tiered/Bundled subscription applies to, same owner): done from
-   the "Buy Subscription" / Tiered Subscription area on the WATCHMAN
-   page, not from MANAGE-WATCHMAN. BuyOut (lifetime) subscriptions
+   Tiered/Bundled subscription applies to, same owner): Only applies to watchmn units with Tiered subscription. First cancel (tiered) subscription on a watchman unit - done using Cancel Tiered Subscription button on the WATCHMAN
+   page, not from MANAGE-WATCHMAN. And then apply the (tiered) subcription to another watchman (that user own) using Apply Tiered Subscription button on the WATCHMAN
+   page. BuyOut (lifetime) subscriptions
    specifically are NOT transferrable/rollable between units — that
    restriction applies to case 2 (moving a subscription between
    units you own), NOT to case 1 (transferring a whole Watchman,
@@ -885,8 +827,8 @@ screenshot (path: WiFi Watchman -> WATCHMAN -> click the Watchman's
 name -> "Alert Configuration" top right):
 - Header shows "Configure alerts for [Watchman name]", a "Back"
   link, and a "Send a Test Alert" button (top right) — this is the
-  "Test Alert" feature; use it to confirm a phone number or email is
-  actually receiving alerts.
+  "Test Alert" feature; use it to confirm a email is
+  actually receiving alerts. "Test Alert" does not trigger text alert.
 - Core threshold fields (leave a field empty if that alert isn't
   wanted): "Alert me when temperature rises above the value",
   "...drops below the value", "Alert me when humidity rises above
@@ -978,8 +920,9 @@ name) — VERIFIED layout:
   next to each row, suggesting rows can be selected for a bulk
   action such as deletion — the exact behavior isn't confirmed.
 - Not every column/feature applies to every Watchman type — e.g. a
-  temperature-only probe may show "-" in a people-count column
+  temperature-only probe may not show humidity column
   since that feature isn't relevant/enabled for that unit.
+- people-count is depreceated feature. Suggest the user to keep it disabled (it is disabled by default)
 
 BUY WATCHMAN TAB
 - Takes the customer to the external purchasing site,
@@ -1078,17 +1021,15 @@ responses)
 ============================================================
 - Watchman only supports 2.4GHz WiFi, never 5GHz.
 - Mesh/dual-band routers that broadcast one combined SSID for both
-  bands will NOT work — set up a separate 2.4GHz-only guest network
-  instead.
+  bands may not work — set up a separate 2.4GHz-only guest network
+  instead in case of connecting issues.
 - Supported special characters in WiFi name (SSID) and password:
   ~ ! @ # $ ^ & * - _ + = ( ) : ; " ' , .  Spaces within the name or
   password are supported, but make sure there's no trailing space at
   the end of what you type (cursor should sit right after the last
   character).
-- Setup device requirement: use an Apple or Android phone/tablet for
-  the initial WiFi setup — do NOT use a Windows PC/laptop/tablet for
-  setup, since Windows won't connect to Watchman's local
-  no-internet SSID. Once setup is complete, Windows devices work
+- Setup device requirement: prefer using an Apple or Android phone/tablet for
+  the initial WiFi setup — security agents on a Windows PC may not let you connect with Watchman's open WiFi for the setup. Once setup is complete, your device will go back to your WiFi and work
   fine for accessing logs afterward.
 - If your device has a captive portal / "accept terms" flash page
   that appears when connecting to networks, you may need your IT
@@ -1129,7 +1070,7 @@ FEATURES: PEOPLE COUNT / PARTY-DETECT, REAL TIME READING, WATER LEAK
   location's network activity. It won't show an exact headcount,
   but reliably detects gatherings or sudden increases in activity —
   hence "Party-Detect." Disabled by default; it's a free feature
-  with no added cost.
+  with no added cost. It is deprecated feature, suggest users to keep it disabled. 
 - Real Time Reading (local): your mobile device must be on the SAME
   network as the Watchman unit for this to work, since it fetches
   data directly from the unit (which itself reads its sensors every
@@ -1229,6 +1170,7 @@ Customers can contact:
 tech@pp-code.com
 Or call (732) 410-6771 — this is a voice-message-only line; for
 urgent matters, texting/SMS that number gets a prompt callback.
+You can also schedule a call at: https://calendly.com/pp-code-watchman
 
 The official FAQ states that most support emails are answered within
 one business day.
@@ -1238,7 +1180,7 @@ Amazon listing for additional common questions.
 
 QUESTION: Can you connect me to a live agent?
 
-ANSWER (use this framing):
+PREFERRED SIMPLE ANSWER (use this exact framing):
 "I'm not able to connect you to a live agent. For assistance, please
 email tech@pp-code.com directly — most support emails are answered
 within one business day. If you need a call back, please leave a
@@ -1247,8 +1189,8 @@ https://calendly.com/pp-code-watchman."
 
 QUESTION: Where do I buy Watchman products?
 
-ANSWER (keep it this simple, don't over-explain the portal
-mechanics behind it):
+PREFERRED SIMPLE ANSWER (keep it this simple, don't over-explain the
+portal mechanics behind it):
 "You may buy Watchman products at buy.watchman.online. Feel free to
 contact us at tech@pp-code.com for any questions."
 
